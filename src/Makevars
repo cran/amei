@@ -1,0 +1,9 @@
+PKG_LIBS = ${LAPACK_LIBS} ${BLAS_LIBS} ${FLIBS} #-lcc_dynamic
+#PKG_CFLAGS = -DDEBUG
+
+
+# uncomment this to use altivec expressly
+# PKG_CFLAGS = -DALTIVEC
+# PKG_LIBS=-faltivec -framework vecLib
+
+
