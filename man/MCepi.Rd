@@ -13,18 +13,19 @@
 }
 \usage{
 MCepi(init, params, vac, costs, T = 40, MCreps = 1000,
-      quant = c(0.025, 0.975), midepi = FALSE, start = 7)
+      quant = c(0.025, 0.975), midepi = FALSE, start = 7, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{init}{ a \code{list} containing scalar entries \code{$S0},
     \code{$I0}, \code{$R0}, \code{$D0} depicting the initial number of
   susceptibles, infecteds, recovereds, and deads in the outbreak }
-\item{params}{ a \code{list} containing scalar entries
-  \code{$b}, \code{$k}, \code{$nu}, and \code{$mu} depicting the
-  \emph{true} parameters of the SIR model representing the transmission
-  probability, clumpiness parameter, the recovery probability, and the
-  mortality probability, respectively }
+  \item{params}{ a \code{list} containing scalar entries
+    \code{$b}, \code{$k}, \code{$nu}, and \code{$mu} depicting the
+    \emph{true} parameters of the SIR model representing the transmission
+    probability, clumpiness parameter, the recovery probability, and the
+    mortality probability, respectively; optionally \code{params}
+    may be an \code{\link{epistep}} function}
 \item{vac}{ a \code{list} containing scalar entries \code{$frac}
   and \code{$stop} depicting the fraction to be vaccinated at each
   time step, and the vaccination (stopping) threshold, respectively }
@@ -45,6 +46,8 @@ MCepi(init, params, vac, costs, T = 40, MCreps = 1000,
   signal that a trajectory is unlikely to be an epidemic }
 \item{start}{ at what time, after time 1 where the state is given
   by \code{init}, should vaccinations be allowed to start }
+\item{...}{ additional arguments passed to a user-defined
+  \code{\link{epistep}} function that may be passed in via \code{params}}
 }
 \details{
   This function simulates many (\code{MCreps}) trajectories of an
@@ -132,7 +135,7 @@ getvac(opt.MCepi)
 T <- length(opt.MCepi$Median$C)
 optC <- getcost(opt.MCepi)
 initC <- getcost(init.MCepi)
-c(initC,optC)
+rbind(initC,optC)
 }
 \keyword{ methods }
 \keyword{ iteration }% __ONLY ONE__ keyword per line

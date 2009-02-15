@@ -1,0 +1,12 @@
+1.0-1 (29 March 2009)
+-----
+
+added bkrate in order to compensate for the high
+negative correlation in the MCMC for b and k
+
+minor modification necessary to fully incorporate
+a new epipstep function (other than the epistep
+provided) and to make a comparison showing the 
+advantage of adaptive mangement over the optimal
+fixed strategy when the true model lies outside the
+class of SIR models considered in the framework

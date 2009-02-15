@@ -1,0 +1,373 @@
+\section{Alternative Transmission Model}
+\label{sec:alt}
+
+For reproducibility of the results in this section we have, again, set
+the random seed as follows.
+<<cache=FALSE>>=
+seed <- 12345
+set.seed(seed)
+@ 
+
+We would like to see how well the fixed and adaptive strategies can do
+when faced not only with parameter mis-specification, but when there
+may be some component of the underlying transmission model that is not
+accounted for in the implemented SIR model upon which its vaccination
+strategies are based.  Towards this end, we chose a fairly simple
+extension of the SIR model where infection does not pass directly from
+individual to individual. Instead, they become infected by
+encountering a reservoir of the infectious agent (for instance
+bacteria or fungi in water or soil), and then infected individuals
+contribute infectious agents to the reservoir. The continuous time
+dynamics are:
+\begin{align}
+\frac{\mathrm{d}S}{\mathrm{d}t} 
+&= -aS\left(\frac{C}{C+C_0}\right) \nonumber \\
+\frac{\mathrm{d}I}{\mathrm{d}t} 
+&= aS\left(\frac{C}{C+C_0}\right) - (\nu+\mu) I  \nonumber \\
+\frac{\mathrm{d}R}{\mathrm{d}t} &= \nu I \label{eq:alt} \\
+\frac{\mathrm{d}D}{\mathrm{d}t} &= \mu I \nonumber \\
+\frac{\mathrm{d}C}{\mathrm{d}t} &= \rho I - m C \nonumber %\\
+%S + I + R + D &=& N. \nonumber
+\end{align}
+where the concentration of the infective agent in the reservoir is
+given by $C$; the transmission rate is modeled by a saturating
+function of $C$, so that as $C\rightarrow\infty$ the transmission rate
+approaches the constant $a$ at a rate determined by $C_0$; infective
+agents die or are removed from the reservoir at rate $mC$; and the
+{\it per capita} rate at which new infected agents are added to the
+reservoir is $\rho$.
+
+This system can be discretized in a similar manner to the system
+discussed earlier, so that the single step transmission dynamics are
+given by:
+\begin{align}
+\tilde{I}|s,C &\sim \mbox{Bin}(s, p_i(a,C,C_0)), 
+\intertext{where}
+p_i(a,C,C_0) &= 1-exp\left(\frac{-aC}{C+C_0} \right) \label{itilde}
+\end{align}
+and Bin$(n,\pi)$ is the standard binomial distribution.  The dynamics
+for $\tilde{R}$ and $\tilde{D}$ are exactly as before
+(Eqs.~(\ref{rtilde}--\ref{dtilde})).  The single step dynamics for the
+reservoir are expected to be more smooth than the epidemic in the
+population at large. For instance, for bacteria the concentration
+could be in the thousands or millions of individuals. In this case the
+evolution of the reservoir is approximately
+\begin{equation}
+C(t+1)-C(t) = [\rho I(t)] - d_c.
+\end{equation}
+Here $d_c$ is the number (per unit reservoir) of infectious agents
+(stochastically) removed from the reservoir in a unit time, which has
+distribution
+\begin{equation}
+d_c \sim \mbox{Bin}(C, p_{d_c}),
+\end{equation}
+where $p_{d_z} = 1-e^{-m}$.
+
+In {\sf R}, we may implement the above transition model by encoding it
+in an alternative {\tt epistep} function for use with the {\tt amei}
+package methods as follows.
+<<keep.source=TRUE,cache=TRUE>>=
+alt.epistep <- 
+function(SIR, last=list(rem=0, rec=0, infect=0, dead=0, Z=0),
+         true=list(a = 0.05, mu = 0.05, nu = 0.1, m = 0.4, 
+	 rho = 200, C = 500))
+{
+  ## calculate the infection probability based on the
+  ## resevoir, and randomly infect susceptibles
+  Z <- last$Z
+  fz <- Z/(Z+true$C)
+  pi <- 1 - exp(-true$a * fz)
+  infect <- rbinom(1, SIR$S, pi)
+
+  ## update recovereds and deaths
+  pr <- 1 - exp(-true$nu)
+  rec <- rbinom(1,SIR$I,pr)
+  pd <- 1 - exp(-true$mu)
+  dead <- rbinom(1, SIR$I-rec, pd)
+
+  ## resevoir dynamics
+  pz <- 1 - exp(-true$m)
+  dz <- rbinom(1, Z, pz)
+  bz <- round(SIR$I*true$rho)
+  Z <- Z - dz + bz
+
+  ## the returned list is passed in as "last" in a
+  ## subsequent call to this "epistep" function
+  return(list(rem=(rec+dead), rec=rec, infect=infect, 
+              dead=dead, Z=Z))
+}
+@ 
+
+Here we first use the {\tt manage} function with a {\tt NULL}
+vaccination strategy (and also, optionally, a {\tt NULL} cost
+structure), in order to see how the behavior of this system compares
+to the default {\tt epistep} model implemented within {\tt amei}. We
+can then also look at the estimated ``effective'' SIR parameters.
+
+This system can resemble the standard SIR model, especially when $m$
+is large, so infective agents do not remain in the reservoir for long.
+<<cache=TRUE>>=
+init1 <- list(S0=150, I0=1, R0=0, D0=0)
+true<- list(a=0.065, mu=0.0, nu=0.3, m=0.99, rho=500, C=500)
+alt.epistep1 <- alt.epistep
+formals(alt.epistep1)$true <- true
+out.alt<- manage(init1, alt.epistep1, NULL, NULL, T=80)
+@ 
+The {\em top} of Figure \ref{f:alt} shows the resulting dynamics
+under the default parameterization offered by the formals of the {\tt
+  alt.epistep} function. To illustrate how this new system can
+(significantly) differ from the SIR dynamics consider the case where
+we take $m$ very to be small.  In this case is possible for new
+infections to occur even if there had been no infected individuals in
+a previous time step since they infective agent may persist in the
+reservoir for a long time without infected individuals being present.
+<<cache=TRUE>>=
+true <- list(a=0.065, mu=0.0, nu=0.3, m=0.005, rho=500, C=500)
+alt.epistep2 <- alt.epistep
+formals(alt.epistep2)$true <- true
+out.alt2 <- manage(init1, alt.epistep2, NULL, NULL, T=80)
+@ 
+\begin{figure}[ht!]
+<<label=alt,fig=TRUE,echo=TRUE,width=7,height=5.5,include=FALSE,cache=TRUE>>=
+plot(out.alt)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt}
+<<label=alt2,fig=TRUE,echo=TRUE,width=7,height=5.5,include=FALSE,cache=TRUE>>=
+plot(out.alt2)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt2}
+\caption{Trajectories in terms of the numbers of susceptibles,
+  infecteds, recovereds, and dead individuals under the alternative
+  model in Eq.~(\ref{eq:alt}) with parameters $\{(a=0.065,
+  mu=0.0, nu=0.3, rho=500, C=500\}$ and with (top) $m=0.99$ (bottom)
+  $m=0.005$. }
+\label{f:alt}
+\end{figure} 
+The effect of these new dynamics may be readily seen in Figure
+\ref{f:alt}, {\em bottom}, as the epidemic progresses. In this second
+case (with small $m$), it is also very unlikely that any susceptible
+individuals will be left at the end of an epidemic. This contrasts
+with both the stochastic SIR model and these alternative dynamics with
+$m$ large, as it is possible that, due to stochastic effects, the
+infection will die out before all susceptibles have been exposed.
+
+\begin{figure}[ht!]
+<<label=alt-params,fig=TRUE,echo=TRUE,width=7,height=5,include=FALSE,cache=TRUE>>=
+plot(out.alt, type="params", showd=TRUE)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-params}
+<<label=alt2-params,fig=TRUE,echo=TRUE,width=7,height=5,include=FALSE,cache=TRUE>>=
+plot(out.alt2, type="params", showd=TRUE)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt2-params}
+\caption{Posterior parameter distributions for $b$, $k$, $\mu$, and
+  $\nu$ when the simulated source epidemic follows the alternative
+  transmission model with parameters $\{(a=0.065, mu=0.0, nu=0.3,
+  rho=500, C=500\}$ and with (top) $m=0.99$ (bottom) $m=0.005$. }
+\label{f:alt-params}
+\end{figure} 
+
+It is interesting to examine the posterior parameter distributions for
+these two cases (Figure \ref{f:alt-params}) if we assume that these
+underlying alternative dynamics are well approximated by the simpler
+SIR model. As one might expect, the estimates of the recovery and
+death rates in both cases are quite similar, especially since these
+dynamics are the same as those implemented within {\tt amei}. However,
+the estimates of $b$ and $k$ are quite different in the two cases.
+The 95\% credible intervals hardly overlap, indicating that the two
+cases result in dynamics that are quantitatively different.
+
+We now move on to our task of examining how well the fixed and
+adaptive strategies can do when faced with an epidemic which is
+evolving according to a transmission function outside the class of SIR
+models (\ref{dS}--\ref{dD}) used to calculate the (optimal) vaccination
+strategy. The first step here is to let the fixed strategy ``cheat''.
+That is, we allow the fixed strategy to see a full epidemic spread
+according to the true model and parameterization and without
+intervention, so as to estimate the best SIR model approximation. To
+do this we use the {\tt manage} function with {\tt NULL} vaccination
+strategy and a {\tt NULL} cost structure, and default ``true''
+parameters.
+%
+% this one with the tricky cost structure give interesting cost
+% surface but isn't necessarily good for comparison
+% costs <- list(vac=3.25, death=25, infect=1) 
+% true<- list(a=0.035, mu=0.0075, nu=0.35, m=0.01, rho=1000, C=500) 
+%
+%
+% the next is similar to above, but the adaptive one does quite a bit
+% worse than the optimal fixed policy, and the epidemic takes longer
+% (T=120) but the surface is pretty cool :-) The reason that the
+% adaptive strategy does poorly is interesting -- in this case it's
+% very important to vaccinate early, since the longer you wait, the
+% larger the reservoir, and this reservoir sticks around to keep
+% infecting individuals
+% costs <- list(vac=3.25, death=40, infect=1)
+% true<- list(a=0.08, mu=0.0075, nu=0.35, m=0.01, rho=20, C=5000)
+%true<- list(a=0.06, mu=0.01, nu=0.3, m=0.15, rho=1000)
+%formals(alt.epistep)$true <- true
+%
+<<cache=TRUE>>=
+init <- list(S0=600, I0=1, R0=0, D0=0)
+time=80
+posterior <- manage(init, alt.epistep, NULL, NULL, T=time, bkrate=100)
+@ 
+%Since $b$ and $k$ are anti-correlated, it helps to obtain more sample 
+%these at a higher rate to ensure good mixing in the Markov chain.
+\begin{figure}[ht!]
+ \centering
+<<label=alt-mixing-b,fig=TRUE,echo=TRUE,width=10,height=4,include=FALSE,cache=TRUE>>=
+plot(log(posterior$samp$b), type="l", main="")
+@ 
+\includegraphics[trim=10 20 10 50,scale=0.2]{amei-alt-mixing-b}
+<<label=alt-mixing-k,fig=TRUE,echo=TRUE,width=10,height=4,include=FALSE,cache=TRUE>>=
+plot(posterior$samp$k, type="l", main="")
+@ 
+\includegraphics[trim=10 20 10 50,scale=0.2]{amei-alt-mixing-k}
+<<label=alt-mixing-nu,fig=TRUE,echo=TRUE,width=10,height=4,include=FALSE,cache=TRUE>>=
+plot(posterior$samp$nu, type="l", main="")
+@ 
+\includegraphics[trim=10 20 10 50,scale=0.2]{amei-alt-mixing-nu}
+<<label=alt-mixing-mu,fig=TRUE,echo=TRUE,width=10,height=4,include=FALSE,cache=TRUE>>=
+plot(posterior$samp$mu, type="l", main="")
+@
+\includegraphics[trim=10 20 10 50,scale=0.2]{amei-alt-mixing-mu}
+\caption{Traces of samples from the posterior distribution of the paramters
+  for the (mis-specified) SIR model.}
+\label{f:alt-mixing}
+\end{figure}
+Figure \ref{f:alt-mixing} shows trace plots of the samples obtained.
+From the output we can extract the mean parameterization obtained
+at the final time point of the epidemic.
+<<cache=TRUE>>=
+mean.params <- as.list(apply(posterior$samp, 2, mean))
+@ 
+
+Based on these parameters, and thus assuming an SIR model, we can
+calculate the optimal static vaccination policy.
+<<cache=TRUE>>=
+costs <- list(vac=2, death=4, infect=1) 
+vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-50,50)) 
+alt.optvac <- optvac(init, mean.params, vacgrid, costs, T=time)
+alt.best <- getpolicy(alt.optvac)
+@ 
+\begin{figure}[ht!]
+<<label=alt-optvac,fig=TRUE,echo=TRUE,width=7,height=6,include=FALSE,cache=TRUE>>=
+plot(alt.optvac)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-optvac}
+\caption{The cost surface calculated for fixed strategies using parameters estimated from a single run of the alternative epidemic model.}
+\label{f:alt-optvac}
+\end{figure} 
+The cost surface is shown in Figure \ref{f:alt-optvac}.
+
+Then, based on the extracted policy, we can use {\tt MCepi} to
+simulate the true evolution of the epidemic (via {\tt alt.epistep})
+many times in order to build up an understanding of the distribution
+of costs of the optimal static policy calculated under the simplified
+SIR parametrization.
+<<cache=TRUE>>=
+alt.vac.opt <- alt.best[3:4]
+alt.MCepi <- MCepi(init, alt.epistep, alt.vac.opt, costs, T=time)
+@ 
+<<cache=FALSE>>=
+getcost(alt.MCepi)
+@ 
+
+Now for the comparison. We provide the {\tt alt.epistep} function to
+{\tt MCmanage} in order to build up an understanding of how the
+optimal adaptive strategy fares under a restricted SIR model. Here we
+use the default, uninformative priors.
+<<cache=TRUE>>=
+alt.MCmanage <- MCmanage(init, alt.epistep, vacgrid, costs, T=time)
+@ 
+<<cache=FALSE>>=
+getcost(alt.MCmanage)
+@ 
+An alternative (and possibly fairer) approach would be to allow the
+adaptive strategy to cheat as well by choosing the prior to be tightly
+concentrated around around the {\tt mean.params} estimated above.
+\begin{figure}[ht!]
+<<label=alt-MCepi-t,fig=TRUE,echo=TRUE,width=5,height=4,include=FALSE,cache=TRUE>>=
+plot(alt.MCepi, showd=TRUE)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-MCepi-t} 
+<<label=alt-MCepi-c,fig=TRUE,echo=TRUE,width=5,height=4,include=FALSE,cache=TRUE>>=
+plot(alt.MCepi, type="costs")
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-MCepi-c}
+\caption{Trajectories in terms of {\em top} the numbers of susceptibles,
+  infecteds, recovereds, and dead individuals under the alternative
+  model in Eq.~(\ref{eq:alt}) and {\em bottom} costs under the default 
+parameterization under the optimal static vaccination policy.}
+\label{f:alt-MCepi}
+\end{figure} 
+\begin{figure}[ht!]
+<<label=alt-MCmanage-t,fig=TRUE,echo=TRUE,width=5,height=4,include=FALSE,cache=TRUE>>=
+plot(alt.MCmanage, showd=TRUE)
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-MCmanage-t} 
+<<label=alt-MCmanage-c,fig=TRUE,echo=TRUE,width=5,height=4,include=FALSE,cache=TRUE>>=
+plot(alt.MCmanage, type="costs")
+@
+\centering
+\includegraphics[trim=0 20 0 20]{amei-alt-MCmanage-c}
+\caption{Trajectories in terms of {\em top} the numbers of susceptibles,
+  infecteds, recovereds, and dead individuals under the alternative
+  model in Eq.~(\ref{eq:alt}) and {\em bottom} costs under the default parameterization under the adaptive vaccination policy.}
+\label{f:alt-MCmanage}
+\end{figure} 
+We can see by looking at the full trajectories in Figures
+\ref{f:alt-MCepi} and \ref{f:alt-MCmanage} that the strategies
+implemented by both the fixed and adaptive methods are very
+similar. On average, the fixed strategy, which has the benefit of
+having seen a complete epidemic in order to estimate the ``real''
+parameters, does a bit better, as we would expect. The adaptive
+strategy can in some cases, do better than the fixed strategy, as can
+be seen by looking at the lowest quantile of the expected
+costs. Indeed, the comparison shows on average the adaptive strategy has 
+lower costs.  However, the adaptive strategy here has a wider interval for
+the final costs, due to the uncertainty in the parameters. Much of
+this uncertainty could be reduced by, for instance, providing the
+adaptive algorithm with informative priors, as mentioned above.
+
+
+We can also look back to Figure \ref{f:alt-optvac} to see the kind of
+improvement that the optimal strategy can have over the case when no
+one (or very few individuals) are vaccinated. We can extract the expected
+cost under this worst fixed strategy and compare it to the best fixed
+strategy directly.
+<<cache=FALSE>>= 
+alt.worst <- getpolicy(alt.optvac, which ="worst") 
+rbind(alt.best, alt.worst) 
+@ 
+Here it is easy to see how much better using an optimal fixed strategy
+with good parameter settings is compared to not vaccinating. Since the
+adaptive strategy has comparable costs to the fixed strategy over many
+trials of the epidemic, we can conclude that the adaptive strategy
+gives similar reductions in costs over the null vaccination policy as
+the fixed policy, even though the adaptive algorithm must begin
+planning and implementing the intervention with considerably less
+information than the fixed strategy it is compared with here.
+
+We have shown here that it is straightforward to build functions with
+fairly simple extensions to the SIR model to use with the {\tt amei}
+package. Using one example, we can see that the model implemented
+within {\tt amei} to plan the interventions is flexible enough to
+allow effective vaccination strategies, even when this model does not
+match the one which is known to govern the true underlying epidemic
+dynamics. We have also shown how one can estimate ``effective'' SIR
+parameters from an alternative dynamic epidemic model. These estimates
+can be used to build a fixed policy, or the posterior samples could
+even be used as parameters to enhance the adaptive strategies.
+
+
+

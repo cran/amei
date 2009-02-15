@@ -4,19 +4,19 @@ theta <- function(b, k, i)
 }
 
 
-mcmc.bknumu<-function(N, b1, k1, nu1, mu1, itilde, rtilde, dtilde,
+mcmc.bknumu<-function(N, bkrate=1, b1, k1, nu1, mu1, itilde, rtilde, dtilde,
                        S, I, hyper)
 {
-  b <- k <- nu <- mu <- rep(0, N+1)
+  b <- k <- rep(0, N*bkrate+1)
+  nu <- mu <- rep(0, N+1)
   b[1] <- b1; k[1] <- k1; nu[1] <- nu1; mu[1] <- mu1
   
-  for(i in 1:N){
+  for(i in 1:(N*bkrate)){
     
     ## for each parameter, propose a new value, calculate
     ## the log posterior value of the current and proposed
     ## value (keeping the other parameters constant), and
-    ## accept the proposed move with prob A (see below)
-    
+    ## accept the proposed move with prob A (see below)  
     
     ## b
     u<-runif(1)
@@ -39,14 +39,20 @@ mcmc.bknumu<-function(N, b1, k1, nu1, mu1, itilde, rtilde, dtilde,
   }
   
   ## no longer doing gibbs steps or mcmc for mu, nu, we can sample directly
-  nu<-epi.log.post.nu(N+1, I, rtilde, dtilde, hyper$nuh)
-  mu<-epi.log.post.mu(N+1, I, rtilde, dtilde, hyper$muh)
-  
+  nu<-epi.gibbs.nu(N+1, I, rtilde, dtilde, hyper$nuh)
+  mu<-epi.gibbs.mu(N+1, I, rtilde, dtilde, hyper$muh)
+
+  ## thin b & k by bkrate first
+  b <- b[c(1,seq(2,(bkrate*N+1),length=N))]
+  k <- k[c(1,seq(2,(bkrate*N+1),length=N))]
+
+  ## then discard the first 10% as burn-in
   b <- b[(0.1*N):(N+1)]
   k <- k[(0.1*N):(N+1)]
   nu <- nu[(0.1*N):(N+1)]
   mu <- mu[(0.1*N):(N+1)]
-  
+
+  ## return the samples
   return(data.frame(b=b, k=k, nu=nu, mu=mu))
 }
 
@@ -65,28 +71,44 @@ propose<-function(b, l=3, h=4)
 
 epi.log.post.b<-function(b, itilde, k, S, I, ab)
 {
-  
+  ## pretend there is at least one infected
+  I[I<=0] <- 1
+
+  ## calculate the binomial likelihood via theta, the
+  ## probability of success
   t<-theta(b,k,I)
   llik<-sum(dbinom(itilde, S, t, log=TRUE))
   
   lprior<-dgamma(b, ab[1], scale=ab[2], log=TRUE) 
-  
+
+  ## check for problems in the likelihood
+  if(!is.finite(llik) || !is.finite(lprior))
+    stop("infinite likelihood or prior encountered")
         
   return( llik + lprior )	
 }
 
 epi.log.post.k<-function(b, itilde, k, S, I, ab)
 {
+  ## pretend there is at least one infected
+  I[I<=0] <- 1
+
+  ## calculate the binomial likelihood via theta, the
+  ## probability of success
   t<-theta(b,k,I)
   llik<-sum(dbinom(itilde, S, t, log=TRUE))
-    
+
   lprior<-dgamma(k, ab[1], scale=ab[2], log=TRUE) 
 
+  ## check for problems in the likelihood
+  if(!is.finite(llik) || !is.finite(lprior))
+    stop("infinite likelihood or prior encountered")
+  
   return( llik + lprior )	
 }	
 
 
-epi.log.post.nu<-function(N, I, rtilde, dtilde, ab){
+epi.gibbs.nu<-function(N, I, rtilde, dtilde, ab){
 
   alpha<-ab[1]
   beta<-ab[2]
@@ -98,7 +120,7 @@ epi.log.post.nu<-function(N, I, rtilde, dtilde, ab){
   return(nu)
 }
 
-epi.log.post.mu<-function(N, I, rtilde, dtilde, ab){
+epi.gibbs.mu<-function(N, I, rtilde, dtilde, ab){
 
   alpha<-ab[1]
   beta<-ab[2]

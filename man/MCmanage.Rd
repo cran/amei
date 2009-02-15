@@ -16,7 +16,7 @@ MCmanage(init, epistep, vacgrid, costs,
      pinit = list(b = 0.1, k = 0.02, nu = 0.2, mu = 0.1), 
      hyper = list(bh = c(1,3), kh = c(1,3), nuh = c(1,1), muh = c(1,1)), 
      vac0 = list(frac = 0, stop = 0), T = 40, MCreps = 30, 
-     MCvits = 50, MCMCpits = 1000, vacsamps = 50,
+     MCvits = 50, MCMCpits = 1000, bkrate = 1, vacsamps = 50,
      quant = c(0.025, 0.975), start = 7, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -68,6 +68,9 @@ population to be vaccinated and the (positive integer) of
 \item{MCMCpits}{ scalar number of Markov chain Monte Carlo iterations used
   at each step to estimate the SIR model parameters in
   \code{\link{manage}}}
+\item{bkrate}{ number of samples of \code{b} and \code{k}, relative
+  to \code{mu} and \code{nu} before a sample of all four parameters
+  is saved in \code{\link{manage}}}
 \item{vacsamps}{ used to thin the MCMC samples of the parameters sampled
   from the posterior that are used to calculate optimal vaccination policies;
   this should be an integer scalar such that \code{0 < vacsamps <= MCMCpits} }

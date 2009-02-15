@@ -9,13 +9,19 @@
   provided
 }
 \usage{
-epistep(SIR, true = list(b = 0.00218, k = 10, nu = 0.4, mu = 0))
+epistep(SIR, last = NULL, true = list(b = 0.00218, k = 10, nu = 0.4, mu = 0))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{SIR}{ a \code{list} with the current scalar values of the
     number of susceptibles (\code{$S}), infecteds (\code{$I}) and
     recovereds (\code{$R}) }
+  \item{last}{ a (dummy) argument used to pass additional information
+    necessary for the sampling the dynamics of the epidemic;
+    the return-value of a user-defined \code{epistep} function would
+    be automatically passed in here by the \code{\link{manage}}
+    function.  This is not required by the simple SIR model
+    implemented here in the default version}
   \item{true}{ a \code{list} containing scalar entries indicating
     the \emph{true} parameters according to which the SIR model evolves
     stochastically: \code{$b}, \code{$k}, \code{$nu}, and \code{$mu}
@@ -31,7 +37,8 @@ epistep(SIR, true = list(b = 0.00218, k = 10, nu = 0.4, mu = 0))
   function may be used as input to \code{\link{MCmanage}} which
   depends on the \code{\link{manage}} function.
 
-  The epidemic described by the default parameterization ({\tt true})
+  The epidemic described by the default parameterization
+  (given by \code{true})
   is an approximation of an influenza epidemic in a British
   boarding school described by Murray (see references below).
   

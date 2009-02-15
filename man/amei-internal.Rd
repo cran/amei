@@ -14,8 +14,8 @@
 \alias{propose}
 \alias{epi.log.post.b}
 \alias{epi.log.post.k}
-\alias{epi.log.post.nu}
-\alias{epi.log.post.mu}
+\alias{epi.gibbs.nu}
+\alias{epi.gibbs.mu}
 \alias{epimanage}
 \alias{epi.update.prime}
 \alias{epi.update.soln}

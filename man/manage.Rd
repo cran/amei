@@ -12,7 +12,7 @@ manage(init, epistep, vacgrid, costs, T = 40,
      pinit = list(b = 0.1, k = 0.02, nu = 0.2, mu = 0.1), 
      hyper = list(bh = c(1,3), kh = c(1,3), nuh = c(1,1), muh = c(1,1)),
      vac0=list(frac=0, stop=0), MCvits = 10, MCMCpits = 1000, 
-     vacsamps = 100, start = 8, ...)
+     bkrate = 1, vacsamps = 100, start = 8, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -27,11 +27,13 @@ manage(init, epistep, vacgrid, costs, T = 40,
  \item{vacgrid}{ a \code{list} containing vector entries \code{$fracs} and
   \code{$stops} indicating the permissible fractions (in [0,1])
   of the population to be vaccinated and the (positive integer) of
-  stopping thresholds having a maximum of \code{init$S0} }
+  stopping thresholds having a maximum of \code{init$S0}; can be
+  \code{NULL}, see details below }
 \item{costs}{ a \code{list} containing scalar entries \code{$vac},
   \code{$death} and \code{$infect} depicting the costs associated
   with a single vaccination or death, or the daily cost of maintaining
-  an infected individual, respectively}
+  an infected individual, respectively; can be \code{NULL}, but only
+  when \code{vacgrid = NULL} also }
   \item{pinit}{ a \code{list} containing scalar entries
   \code{$b}, \code{$k}, \code{$nu}, and \code{$mu} depicting the
   \emph{initial values} of parameters of the SIR model representing
@@ -60,6 +62,10 @@ manage(init, epistep, vacgrid, costs, T = 40,
   vaccination policy }
 \item{MCMCpits}{ scalar number of Markov chain Monte Carlo iterations used
   at each step to estimate the SIR model parameters }
+\item{bkrate}{ number of samples of \code{b} and \code{k}, relative
+  to \code{mu} and \code{nu} before a sample of all four parameters
+  is saved; this acknowledges that \code{b} and \code{k} are correlated
+  and thus mix slower than \code{mu} and \code{nu} }
 \item{vacsamps}{ used to thin the MCMC samples of the parameters sampled
   from the posterior that are used to calculate optimal vaccination policies;
   this should be an integer scalar such that \code{0 < vacsamps <= MCMCpits} }
@@ -78,8 +84,8 @@ manage(init, epistep, vacgrid, costs, T = 40,
   That policy is then enacted, and then time is incremented.
 
   Parameter estimation (alone) can be performed by specifying the
-  \dQuote{null} vaccination grid \code{vacgrid = list(fracs=0, stops=0)}
-  with the default \code{vac0}.
+  \dQuote{null} vaccination grid \code{vacgrid = NULL},
+  i.e., with \code{vac0}.
   
   For more details on the parameterization and simulation of the
   SIR model, etc., and the calculation of the optimal vaccination

@@ -16,7 +16,8 @@
 */
 void SimulateEpidemic(int* S, int* I, int* R, int* D, int* V, double* C, int T,
 		      double b, double k, double nu, double mu,
-		      double vacc, int vaccstop,double cvacc, double cdeath, double cinfected,int starttime)
+		      double vacc, int vaccstop,double cvacc, double cdeath, 
+		      double cinfected,int starttime)
 {
   int N0,i,t,itilde,rtilde,dtilde,ztilde,vtilde;
   //int doagain,howmany;
@@ -91,7 +92,8 @@ void SimulateEpidemic(int* S, int* I, int* R, int* D, int* V, double* C, int T,
       R[t] = R[t-1] + rtilde;
       D[t] = D[t-1] + dtilde;
       V[t] = V[t-1] + vtilde;
-      C[t] = C[t-1] + cinfected*(double)(I[t-1]-dtilde) + cvacc*(double)vtilde + cdeath*(double)(dtilde);
+      C[t] = C[t-1] + cinfected*(double)(I[t-1]-dtilde) + cvacc*(double)vtilde + 
+	cdeath*(double)(dtilde);
       
     }
   

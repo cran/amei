@@ -1,16 +1,21 @@
-
+##
 manage <- function(init, epistep, vacgrid, costs, T=40,
                    pinit = list(b=.1,k =.02,nu=.2,mu=.1),          # initial parameter values
                    hyper = list(bh=c(1,3), kh=c(1,3), nuh=c(1,1), muh=c(1,1)), #hyperparameter
                    vac0 = list(frac=0, stop=0),                    # policy enacted before estimation, if any
-                   MCvits=10, MCMCpits=1000, vacsamps=100,
-                   start=8 , ...)                              # time step to begin vaccination calculation
+                   MCvits=10, MCMCpits=1000, bkrate=1,
+                   vacsamps=100, start=8 , ...)                    # time step to begin vaccination calculation
 {
-  ##   graphics.off();
-  ##   x11(); x11();
-  ##   mydevs = dev.list()
-  howmany=0
-  doagain=TRUE
+
+  ## get the initial last setting in epistep
+  last <- formals(epistep)$last
+
+  ## check for validity of costs argument
+  if(is.null(costs) && !is.null(vacgrid))
+    stop("costs cannot be NULL when vacgrid != NULL")
+  
+  howmany <- 0
+  doagain <- TRUE
   while(doagain && howmany<100)
     {      
       ## initialize the soln data frame
@@ -35,6 +40,7 @@ manage <- function(init, epistep, vacgrid, costs, T=40,
       ##   nu <- 0.1; mu <- 0.001
       
       doagain=FALSE
+      a1ive <- 1
       ## step through time
       for( i in 2:T ){
         
@@ -47,10 +53,11 @@ manage <- function(init, epistep, vacgrid, costs, T=40,
           }
         
         ## check if there is a need to vaccinate
-        if(! (soln$S[i-1] == 0 || soln$I[i-1] == 0) && i>=start && havesamps && soln$S[i-1]>STOP)
+        if(! (is.null(vacgrid) || soln$S[i-1] == 0 || soln$I[i-1] == 0) &&
+           i>=start && havesamps && soln$S[i-1]>STOP)
           {
             ## call newvacpolicy so that vcsamps samples are taken
-        ## conditional on a thinned version of samp
+            ## conditional on a thinned version of samp
             VACs <- vaccinate(soln$S[i-1], soln$I[i-1], samp, vacsamps,
                                costs, MCvits, T-i+1, vacgrid)
             
@@ -78,25 +85,32 @@ manage <- function(init, epistep, vacgrid, costs, T=40,
         
         ## simulate one step forward in the epidemic, with epistep, with
         ## vaccinations and cullings coming first in epimanage
-        out <- epimanage(soln=soln, epistep=epistep, i=i, VAC=VAC, STOP=STOP, ...)
+        out <- epimanage(soln=soln, epistep=epistep, i=i, VAC=VAC, STOP=STOP,
+                         last=last, ...)
+        last <- out$last
+        out <- out$out
         
         ## update (prime) totals
         prime[i,] <- epi.update.prime(soln[i-1,], out)
         
         ## update (soln) totals
         soln[i,] <- epi.update.soln(soln[i-1,], out, costs)
+
+        ## keep track of last time that the epidemic is "live"
+        if((soln$S[i]>0 && soln$I[i]>0)) alive <- i
         
         ## do T MH/Gibbs steps to sample from the join distrib of b, k, mu and nu
-        if(soln$S[i]>0 && soln$I[i]>0)
-          {
-            samp <- mcmc.bknumu(MCMCpits, b, k, nu, mu, soln$itilde[2:i], soln$rtilde[2:i],
-                                soln$dtilde[2:i], prime$S[2:i], prime$I[2:i], hyper)
-            
-            ## collect means    
-            b <- mean(samp$b); k <- mean(samp$k); nu <- mean(samp$nu);
-            mu <- mean(samp$mu)
-            havesamps=TRUE
-          }
+        if(is.null(vacgrid) && i != T) next;
+        if(soln$S[i]>0 && soln$I[i]>0 || (i == T)) {
+          samp <- mcmc.bknumu(MCMCpits, bkrate, b, k, nu, mu, soln$itilde[2:alive],
+                              soln$rtilde[2:alive], soln$dtilde[2:alive], prime$S[2:alive],
+                              prime$I[2:alive], hyper)
+          
+          ## collect means    
+          b <- mean(samp$b); k <- mean(samp$k); nu <- mean(samp$nu);
+          mu <- mean(samp$mu)
+          havesamps=TRUE
+        }
       }
     }	
   ##X11()
@@ -112,9 +126,19 @@ manage <- function(init, epistep, vacgrid, costs, T=40,
   ## make allpolicies into a data frame
   allpolicies <- data.frame(allpolicies)
   names(allpolicies) <- c("frac", "stop")
-  
-  r <- list(soln=soln, vachist=list(fracs=allVfracs, stops=allVstops),
-            pols=allpolicies, vactimes=allVtimes, samp=samp)
+
+  ## start to construct outputs
+  r <- list(soln=soln, samp=samp)
+
+  ## some outputs meaninglist when vacgrid = NULL
+  if(is.null(vacgrid)) r$vachist <- r$vactimes <- r$pols <- NULL
+  else {
+    r$vachist <- list(fracs=allVfracs, stops=allVstops)
+    r$vactimes <- allVtimes
+    r$pols <- allpolicies
+  }
+
+  ## save call and return
   r$call <- match.call()
   class(r) <- "epiman"
   return(r)
@@ -166,11 +190,20 @@ epi.update.prime <- function(soln, out)
 
 epi.update.soln <- function(s, out, costs)
   {
+    if(!is.null(costs)) {
+      ##cost.update <- s$C+ costs$infect*s$I + costs$vac*out$justvacc +
+        ##costs$death*out$justdied
+      cost.update <- s$C
+      cost.update <- cost.update + costs$infect*(s$I-out$justdied)
+      cost.update <- cost.update + costs$vac*out$justvacc
+      cost.update <- cost.update + costs$death*out$justdied
+    } else cost.update <- NA
+    
     soln <-
       data.frame(
                  TIME = s$TIME+1,
                  S = s$S - out$justvacc - out$newi,
-                 I = s$I - out$justcull - out$justrec - out$justdied+out$newi,
+                 I = s$I - out$justcull - out$justrec - out$justdied + out$newi,
                  R = s$R + out$justrec, #+ out$justvacc + out$justcull
                  D = s$D + out$justdied,
                  itilde = out$newi,
@@ -178,7 +211,7 @@ epi.update.soln <- function(s, out, costs)
                  dtilde = out$justdied,
                  V = s$V + out$justvacc,  
                  QC = s$QC + out$justcull,
-                 C = s$C+ costs$infect*s$I+costs$vac*out$justvacc+costs$death*out$justdied)
+                 C = cost.update)
     
     return(soln)
   }
@@ -260,7 +293,7 @@ vaccinate <- function(nS,nI, samp, vacsamps, costs,
 ## simulate the epidemic one time step foreward based on
 ## the previous time step and the parameters k, b, nu and mu
 
-epistep <- function(SIR, true=list(b=0.00218, k=10, nu=0.4, mu=0))
+epistep <- function(SIR, last=NULL, true=list(b=0.00218, k=10, nu=0.4, mu=0))
   {
     b <- true$b; k <- true$k; nu <- true$nu; mu <- true$mu
     
@@ -292,15 +325,17 @@ epistep <- function(SIR, true=list(b=0.00218, k=10, nu=0.4, mu=0))
 ## whatever epistep needs to do its business, like b,k,nu, and mu
 ## (true) for example
 
-epimanage <- function(soln, epistep=epistep, i, VAC=0.1, STOP=1, ...)
+epimanage <- function(soln, epistep=epistep, i, VAC=0.1, STOP=1, last=NULL, ...)
 { 
     ## compute the vacc/cull policy
     ##  if( i == 2){  ## why is this set at 2? maybe we want to vaccinate immediately
     ##     	vacc<-0
     ##     	cull<-0	
     ##     }else{
-    if(soln$S[i-1]>STOP) vac <- round(VAC*soln$S[i-1])
-    else vac <- 0
+    if(soln$S[i-1]>STOP) {
+      vac <- ceiling(VAC*soln$S[i-1])
+      ##vac <- round(VAC*soln$S[i-1])
+    } else vac <- 0
     ##  	justcull<-round(CULL*soln$I[i-1])
     cull<-0
     ##}
@@ -308,7 +343,7 @@ epimanage <- function(soln, epistep=epistep, i, VAC=0.1, STOP=1, ...)
     ## use epistep to simulate one time step forward based on the
     ## previous time step and the parameters b, k, nu, and mu
     SIR <- list(S=soln$S[i-1]-vac, I=soln$I[i-1]-cull, R=NA)
-    just <- epistep(SIR, ...)
+    just <- epistep(SIR, last=last, ...)
 
     ## assemble the outputs
     out <- matrix(0, ncol=5, nrow=1)
@@ -319,6 +354,6 @@ epimanage <- function(soln, epistep=epistep, i, VAC=0.1, STOP=1, ...)
     out[1,5] <- just$dead
     out <- data.frame(out)
     names(out) <- c("justvacc", "justcull", "justrec", "newi", "justdied")
-    out
-  
+
+    return(list(out=out, last=just))
 }

@@ -13,7 +13,7 @@ demonstration we have set a low default of {\tt MCreps = 30} and have
 used low defaults for the other Monte Carlo parameters to {\tt
   management}.
 
-<<>>=
+<<cache=TRUE>>=
 out.MCmanage <- MCmanage(init, epistep, vacgrid, costs)
 @ 
 To reproduce the results in Merl, et al.~\cite{merl08}, use 
@@ -25,12 +25,12 @@ class \verb!"MCepi"! with fields similar to those that are output from
 the {\tt MCepi} function which implements a static (fixed) vaccination 
 strategy.  Thus, the same generic plot commands can be used.
 \begin{figure}[ht!]
-<<label=MCmanepis,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=MCmanepis,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.MCmanage)
 @
 \centering
 \includegraphics{amei-MCmanepis}
-<<label=MCmancosts,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=MCmancosts,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.MCmanage, type="costs")
 @
 \includegraphics{amei-MCmancosts}
@@ -43,16 +43,16 @@ Figure \ref{f:epismanage} shows plots summarizing the distribution of
 epidemic trajectories (top) and costs (bottom) under the adaptive
 management.  Distributional information on number of vaccine units
 dispensed can be extracted as follows.
-<<>>=
+<<cache=TRUE>>=
 getvac(out.MCmanage)
 @ 
 \begin{figure}[ht!]
-<<label=MCmanfracs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=MCmanfracs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.MCmanage, type="fracs")
 @
 \centering
 \includegraphics{amei-MCmanfracs}
-<<label=MCmanstops,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=MCmanstops,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.MCmanage, type="stops")
 @
 \includegraphics{amei-MCmanstops}
@@ -68,7 +68,7 @@ trajectories under adaptive management in the Monte Carlo experiment.
 We can compare the costs (and quantile bounds) to that of the best
 fixed vaccination strategy calculated assuming that the true
 parameterization is known.
-<<>>=
+<<cache=TRUE>>=
 cinit <- getcost(init.MCepi)
 copt <- getcost(opt.MCepi)
 cman <- getcost(out.MCmanage)
@@ -88,12 +88,12 @@ epidemic progressed, but rather by guessing what the appropriate
 parameters might be.  Suppose our best guess at the parameters
 underestimated the true transmission probability $b$ and overestimated
 the true recovery probability $\nu$.
-<<>>=
+<<cache=TRUE>>=
 bad <- list(b=0.001, k=10, nu=0.9, mu=0)
 @ 
 The optimal (static) policy under this parameterization can
 be constructed, as demonstrated above.
-<<>>=
+<<cache=TRUE>>=
 costs.bad <- optvac(init, bad, vacgrid, costs)
 pol.bad <- getpolicy(costs.bad)
 pol.bad
@@ -101,7 +101,7 @@ pol.bad
 Then, we can calculate the distribution of costs of managing
 the true epidemic with a policy developed under our best guess
 of the parameterization.
-<<>>=
+<<cache=TRUE>>=
 bad.MCepi <- MCepi(init, true, pol.bad[3:4], costs)
 cbad <- getcost(bad.MCepi)
 cbad

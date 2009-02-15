@@ -9,28 +9,31 @@ function (x, type = c("epi", "costs", "params", "fracs", "stops"),
         PlotEpi(x$soln, showd = showd, main = main)
     }
     else if (type == "costs") {
-        if (is.null(main)) 
-            main <- "Evolution of Costs"
-        PlotCosts(x$soln, main = main)
+      if(is.null(x$pols)) stop("no vaccination strategy used")
+      if (is.null(main)) 
+        main <- "Evolution of Costs"
+      PlotCosts(x$soln, main = main)
     }
     else if (type == "params") {
-        if (is.null(main)) 
-            main <- "MCMC Inference"
-        PlotParams(x$samp, NULL, true)
+      if (is.null(main)) 
+        main <- "MCMC Inference"
+      PlotParams(x$samp, NULL, true)
     }
     else if (type == "fracs") {
-        ylab <- "vaccination fraction"
-        TimeSeriesOfDensities(x$vachist$fracs, x$vactimes, 
-            c(-0.1, 1.1), ylab)
-        if (!is.null(main)) 
-            title(main)
+      if(is.null(x$vachist)) stop("no vaccination strategy used")
+      ylab <- "vaccination fraction"
+      TimeSeriesOfDensities(x$vachist$fracs, x$vactimes, 
+                            c(-0.1, 1.1), ylab)
+      if (!is.null(main)) 
+        title(main)
     }
     else {
-        ylim <- "stop number"
-        TimeSeriesOfDensities(x$vachist$stops, x$vactimes, 
-            c(0, x$soln$S[1]), ylim)
-        if (!is.null(main)) 
-            title(main)
+      if(is.null(x$vachist)) stop("no vaccination strategy used")
+      ylim <- "stop number"
+      TimeSeriesOfDensities(x$vachist$stops, x$vactimes, 
+                            c(0, x$soln$S[1]), ylim)
+      if (!is.null(main)) 
+        title(main)
     }
 }
 

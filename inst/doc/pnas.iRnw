@@ -1,6 +1,6 @@
 For reproducibility of the results in this section we have set
 the random seed as follows.
-<<>>=
+<<cache=TRUE>>=
 seed <- 12345
 set.seed(seed)
 @ 
@@ -29,7 +29,7 @@ daily cost of maintaining an infected individual.
 We are interested in the costs of a no--vaccination policy on epidemic
 trajectories with the above parameters. To explore this, we set the
 vaccination policy used in the simulation to zero. 
-<<>>=
+<<cache=TRUE>>=
 vac <- list(frac=0, stop=0)
 @
 
@@ -41,7 +41,7 @@ the epidemic progression the function calculates the cost over time
 for the epidemic. This is repeated many times, and the mean
 trajectories for both the populations and the costs, as well as the
 5th and 95th quantiles, are recorded.
-<<>>=
+<<cache=TRUE>>=
 init.MCepi <- MCepi(init, true, vac, costs)
 @ 
 
@@ -51,12 +51,12 @@ the epidemic progresses (top panel of Figure \ref{f:epis}), as well as
 the distribution of costs over time (bottom panel of Figure
 \ref{f:epis}).
 \begin{figure}[ht!]
-<<label=epis,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=epis,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(init.MCepi)
 @
 \centering
 \includegraphics{amei-epis}
-<<label=costs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=costs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(init.MCepi, type="costs")
 @
 \includegraphics{amei-costs}
@@ -77,7 +77,7 @@ vaccinating susceptibles when the remaining susceptible population
 falls below some threshold between 2 and the initial susceptible
 population minus 75, in increments of 75, as explained in Section
 \ref{sec:optvac}.
-<<>>= 
+<<cache=TRUE>>= 
 vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-75,75)) 
 @
 Once this grid has been initialized, we can run the Monte Carlo
@@ -86,13 +86,13 @@ policy that minimizes the total cost of the (stochastic) epidemic.
 This is done by simulating the epidemic forward under the known,
 {\tt true}, parameterization and calculating the cost of each
 vaccination strategy.  
-<<>>=
+<<cache=TRUE>>=
 out.optvac <- optvac(init, true, vacgrid, costs) 
 @ 
 This function outputs the costs for each of the possible vaccination
 strategies. The  best and worst policies can be obtained as
 follows:
-<<>>= 
+<<cache=TRUE>>= 
 best <- getpolicy(out.optvac) 
 worst <-getpolicy(out.optvac, which="worst") 
 rbind(best, worst) 
@@ -105,7 +105,7 @@ are in deep red, and high cost areas are light yellow (Figure
 \ref{f:optvac}).
 
 \begin{figure}[ht!]
-<<label=optvac,fig=TRUE,echo=TRUE,width=8,height=7,include=FALSE>>=
+<<label=optvac,fig=TRUE,echo=TRUE,width=8,height=7,include=FALSE,cache=TRUE>>=
 plot(out.optvac) 
 @ 
 \centering \includegraphics{amei-optvac}
@@ -125,17 +125,17 @@ the trajectory of costs under this strategy. We do this by again
 simulating the epidemic dynamics using the function {\tt MCepi},
 however this time we include the best fixed vaccination policy.
 
-<<>>=
+<<cache=TRUE>>=
 vac.opt <- best[3:4]
 opt.MCepi <- MCepi(init, true, vac.opt, costs)
 @
 \begin{figure}[ht!]
-<<label=episov,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=episov,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(opt.MCepi)
 @
 \centering
 \includegraphics{amei-episov}
-<<label=costsov,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=costsov,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(opt.MCepi, type="costs")
 @
 \centering
@@ -157,7 +157,7 @@ The number of vaccinated individuals can be added to the plot by
 specifying the argument {\tt showv = TRUE}, however we omit this here
 to reduce clutter in the figure.  Information on the distribution of
 the number of vaccine  units dispensed can be extracted as follows.
-<<>>=
+<<cache=TRUE>>=
 getvac(opt.MCepi)
 @  
 
@@ -170,7 +170,7 @@ no--vaccination strategy in Figure \ref{f:epis} (bottom). We can
 easily extract information on the distribution of final costs of the
 no--vaccination and optimal (fixed) vaccination policies for
 comparison as follows.
-<<>>=
+<<cache=TRUE>>=
 T <- length(opt.MCepi$Median$C)
 optC <- getcost(opt.MCepi)
 initC <- getcost(init.MCepi)
@@ -181,7 +181,7 @@ approximately \Sexpr{initC$mean-optC$mean} units, or
 \Sexpr{round(100*(1-optC$mean/initC$mean))}\%.  The same 
 information is available through the generic {\tt print} and
 {\tt summary} commands, e.g.,
-<<>>=
+<<cache=TRUE>>=
 opt.MCepi
 @ 
 
@@ -193,8 +193,7 @@ up the function which is going to dictate the (true) evolution of the
 epidemic. This is done via {\tt epistep}, which has dynamics as given
 in Eq.~(\ref{bini}--\ref{dtilde}), earlier, as the default. However,
 the user can specify this function however they wish.  We describe
-another way to parameterize {\tt epistep}, from real data, in Section
-\ref{sec:ex2}.
+another {\tt epistep} function in Section \ref{sec:alt}.
 
 We also need to start with an initial guess, {\em i.e.}, priors, for the
 epidemic parameters that we want to estimate. The default option is to
@@ -217,16 +216,16 @@ explained in Section \ref{sec:optvac} we choose the to implement the
 strategy that most frequently minimizes the cost. After the
 intervention is implemented, the state in the next time step is
 determined by {\tt epistep}, and the process is repeated.
-<<>>= 
+<<cache=TRUE>>= 
 out.man <- manage(init, epistep, vacgrid, costs) 
 @
 \begin{figure}[ht!]
-<<label=epi,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=epi,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.man)
 @
 \centering
 \includegraphics{amei-epi}
-<<label=cost,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
+<<label=cost,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
 plot(out.man, type="cost")
 @
 \centering
@@ -245,7 +244,7 @@ management to the case without vaccination (Figure \ref{f:epis},
 bottom), as well as the case of optimal vaccination with perfect
 information (Figure \ref{f:epis:ov}, bottom).  As before, we can 
 extract information on the final cost of the epidemic as follows.
-<<>>=
+<<cache=TRUE>>=
 getcost(out.man)
 @ 
 Since the {\tt manage} function is not performing a Monte Carlo
@@ -259,7 +258,7 @@ version of the adaptive management strategy to make a more meaningful
 comparison.
 
 \begin{figure}[ht!]
-<<label=params,fig=TRUE,echo=TRUE,width=8,height=7,include=FALSE>>=
+<<label=params,fig=TRUE,echo=TRUE,width=8,height=7,include=FALSE,cache=TRUE>>=
 true <- as.list(formals(epistep)$true)
 plot(out.man, type="params",true=true) 
 @ 
@@ -274,29 +273,29 @@ and the central 95\% region of the distribution is shaded.}
 We can also see the final distribution of the SIR model parameters.
 This is shown in Figure \ref{f:params}.  A summary is provided by
 the generic {\tt print} and {\tt summary} commands:
-<<>>=
+<<cache=TRUE>>=
 out.man
 @  
-{\bf Perhaps we should also show the evolution of the parameter 
-distribution over time. }
-\begin{figure}[ht!]
-<<label=fracs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
-plot(out.man, type="fracs")
-@
-\centering
-\includegraphics[trim=0 0 0 40]{amei-fracs}
-<<label=stops,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE>>=
-plot(out.man, type="stops")
-@
-\includegraphics[trim=0 0 0 40]{amei-stops}
-\caption{The fraction vaccinated (top) and the stop time (bottom)
-at each time step in the evolution of the epidemic under management
-when vaccinations start at time 8, by default.}
-\label{f:evol}
-\end{figure}
-Finally we can explore how the adaptive vaccination strategy evolves
-over time. Figure \ref{f:evol} shows the fraction vaccinated (top) and
-the stop time (bottom) at each time step after vaccinations are
-allowed to start (the default is time 8).  {\bf Can we say something
-  more about these plots, generally --- not the specific ones
-  we got this time?}
+%{\bf Perhaps we should also show the evolution of the parameter 
+%distribution over time. }
+% \begin{figure}[ht!]
+% <<label=fracs,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
+% plot(out.man, type="fracs")
+% @
+% \centering
+% \includegraphics[trim=0 0 0 40]{amei-fracs}
+% <<label=stops,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
+% plot(out.man, type="stops")
+% @
+% \includegraphics[trim=0 0 0 40]{amei-stops}
+% \caption{The fraction vaccinated (top) and the stop time (bottom)
+% at each time step in the evolution of the epidemic under management
+% when vaccinations start at time 8, by default.}
+% \label{f:evol}
+% \end{figure}
+% Finally we can explore how the adaptive vaccination strategy evolves
+% over time. Figure \ref{f:evol} shows the fraction vaccinated (top) and
+% the stop time (bottom) at each time step after vaccinations are
+% allowed to start (the default is time 8).  {\bf Can we say something
+%   more about these plots, generally --- not the specific ones
+%   we got this time?}

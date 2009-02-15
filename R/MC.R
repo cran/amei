@@ -1,12 +1,10 @@
 `MCepi` <-
 function (init, params, vac, costs, T = 40, MCreps = 1000, quant = c(0.025, 
-    0.975), midepi = FALSE, start = 7) 
+    0.975), midepi = FALSE, start = 7, ...) 
 {
     SEQ <- SimulateEpidemicQuantiles
-    out <- SEQ(init$S0, init$I0, init$R0, init$D0, T, params$b, 
-        params$k, params$nu, params$mu, vac$frac, vac$stop, costs$vac, 
-        costs$death, costs$infect, MCreps, quant[1], quant[2], 
-        midepi, start)
+    out <- SEQ(init, T, params, vac$frac, vac$stop, costs, MCreps,
+               quant[1], quant[2], midepi, start, ...)
     out$quant=quant
     out$call <- match.call()
     class(out) <- "MCepi"
@@ -18,14 +16,15 @@ function (init, epistep, vacgrid, costs, pinit = list(b = 0.1,
     k = 0.02, nu = 0.2, mu = 0.1), hyper = list(bh = c(1, 3), 
     kh = c(1, 3), nuh = c(1, 1), muh = c(1, 1)),
     vac0 = list(frac=0, stop=0), T = 40, MCreps = 30,
-    MCvits = 50, MCMCpits = 1000, vacsamps = 50, quant = c(0.025, 0.975),
-          start = 7, ...) 
+    MCvits = 50, MCMCpits = 1000, bkrate=1, vacsamps = 50,
+          quant = c(0.025, 0.975), start = 7, ...) 
 {
     out <- SimulateManagementQuantiles(epistep = epistep, T, 
         pinit = pinit, init = init, hyper = hyper,
         vac0=vac0, costs = costs, vacgrid = vacgrid, MCvits = MCvits, 
-        MCMCpits = MCMCpits, vacsamps = vacsamps, start = start + 
-            1, nreps = MCreps, lowerq = quant[1], upperq = quant[2], ...)
+        MCMCpits = MCMCpits, bkrate=bkrate, vacsamps = vacsamps,
+        start = start + 1, nreps = MCreps, lowerq = quant[1],
+        upperq = quant[2], ...)
     out$quant=quant
     out$call <- match.call()
     class(out) <- "MCepi"

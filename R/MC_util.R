@@ -1,27 +1,63 @@
-SimulateEpidemic = function(S0,I0,R0,D0,T,b,k,nu,mu,vacc,vaccstop,cvacc,
-                            cdeath,cinfected,starttime)
+SimulateEpidemic = function(init,T,params,vacc,vaccstop,costs,starttime, ...)
   {
-    cout = .C("RSimulateEpidemic",
-      S = as.integer(rep(S0,T)),
-      I = as.integer(rep(I0,T)),
-      R = as.integer(rep(R0,T)),
-      D = as.integer(rep(D0,T)),
-      V = as.integer(rep(0,T)),
-      C = as.double(rep(0,T)),
-      T = as.integer(T),
-      b = as.double(b),
-      k = as.double(k),
-      nu = as.double(nu),
-      mu = as.double(mu),
-      vacc=as.double(vacc),
-      vaccstop=as.integer(vaccstop),
-      cvacc = as.double(cvacc),
-      cdeath = as.double(cdeath),
-      cinfected = as.double(cinfected),
-      starttime=as.integer(starttime),
-      PACKAGE="amei")
+    if(!is.function(params)) {
+      soln = .C("RSimulateEpidemic",
+        S = as.integer(rep(init$S,T)),
+        I = as.integer(rep(init$I,T)),
+        R = as.integer(rep(init$R,T)),
+        D = as.integer(rep(init$D,T)),
+        V = as.integer(rep(0,T)),
+        C = as.double(rep(0,T)),
+        T = as.integer(T),
+        b = as.double(params$b),
+        k = as.double(params$k),
+        nu = as.double(params$nu),
+        mu = as.double(params$mu),
+        vacc=as.double(vacc),
+        vaccstop=as.integer(vaccstop),
+        cvacc = as.double(costs$vac),
+        cdeath = as.double(costs$death),
+        cinfected = as.double(costs$infect),
+        starttime=as.integer(starttime),
+        PACKAGE="amei")
+    } else {
 
-    list(S = cout$S,I=cout$I,R=cout$R,D=cout$D,V=cout$V,C=cout$C)
+      ## params is an epistep
+      epistep <- params
+      
+      ## initialize the soln data frame
+      soln <- init.soln(init, T)
+      
+      ## initialize the prime data frame
+      prime <- data.frame(matrix(0, ncol=2, nrow=T))
+      names(prime)<-c("S", "I")
+
+      ## get the initial last setting in epistep
+      last <- formals(epistep)$last
+
+      for( i in 2:T ){
+
+        ## deal with starttime
+        if(i <= starttime) { VAC <- 0; STOP <- 0 }
+        else { VAC <- vacc; STOP <- vaccstop }
+        
+        ## treat params like an epistep function
+        out <- epimanage(soln=soln, epistep=epistep, i=i, VAC=VAC, STOP=STOP,
+                         last=last, ...)
+        last <- out$last
+        out <- out$out
+        
+        ## update (prime) totals
+        prime[i,] <- epi.update.prime(soln[i-1,], out)
+        
+        ## update (soln) totals
+        soln[i,] <- epi.update.soln(soln[i-1,], out, costs)
+      }
+
+      
+    }
+
+    list(S = soln$S, I=soln$I, R=soln$R, D=soln$D, V=soln$V, C=soln$C)
   }
 
 ## ok, if midepidemic is true, then we're just going to accept all epidemics
@@ -58,7 +94,7 @@ VarStopTimePolicy = function(S0,I0,T,b,k,nu,mu,cvacc,cdeath,cinfected,
 
 
 SimulateManagementQuantiles <- function(epistep,Time,init, pinit, hyper, vac0,
-                                        costs, start, MCvits, MCMCpits,vacsamps,
+                                        costs, start, MCvits, MCMCpits, bkrate, vacsamps,
                                         vacgrid, nreps,lowerq, upperq, verb=FALSE, ...)
   {
     Sall = matrix(0,nrow=Time,ncol=nreps)
@@ -73,7 +109,7 @@ SimulateManagementQuantiles <- function(epistep,Time,init, pinit, hyper, vac0,
       {
         if(verb) cat("*** Simulating epidemic",n,"***\n")
         foo <- manage(epistep=epistep,pinit=pinit,T=Time,init=init,hyper=hyper,
-                          vac0, costs=costs, MCMCpits=MCMCpits,
+                          vac0, costs=costs, MCMCpits=MCMCpits, bkrate=bkrate,
                           vacsamps=vacsamps, vacgrid=vacgrid, start=start, ...)
         Sall[,n] = foo$soln$S
         Iall[,n] = foo$soln$I
@@ -128,8 +164,8 @@ SimulateManagementQuantiles <- function(epistep,Time,init, pinit, hyper, vac0,
 
   
 
-SimulateEpidemicQuantiles = function(S0,I0,R0,D0,T,b,k,nu,mu,vacc,vaccstop,cvacc,cdeath,
-  cinfected,nreps,lowerq,upperq,midepidemic,starttime)
+SimulateEpidemicQuantiles = function(init,T,params,vacc,vaccstop,costs,
+  nreps,lowerq,upperq,midepidemic,starttime)
   {
     Sall = matrix(0,nrow=T,ncol=nreps)
     Iall = matrix(0,nrow=T,ncol=nreps)
@@ -142,11 +178,11 @@ SimulateEpidemicQuantiles = function(S0,I0,R0,D0,T,b,k,nu,mu,vacc,vaccstop,cvacc
         blah=TRUE;blahcount=0
         while(blah)
           {
-            foo = SimulateEpidemic(S0,I0,R0,D0,T,b,k,nu,mu,vacc,vaccstop,cvacc,cdeath,cinfected,starttime)
+            foo = SimulateEpidemic(init,T,params,vacc,vaccstop,costs,starttime)
             if(!midepidemic)
               {
                 blahcount = blahcount+1
-                if(foo$I[starttime-1]>I0)##sum(foo$I[-1]>foo$I[1])>1 | (b<=0 | k<=0) | vacc==1 | midepidemic)
+                if(foo$I[starttime-1]>init$I)##sum(foo$I[-1]>foo$I[1])>1 | (b<=0 | k<=0) | vacc==1 | midepidemic)
                   blah=FALSE
                 if(blahcount==100)
                   {
