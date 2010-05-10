@@ -8,7 +8,7 @@
   optimal vaccination strategy accordingly
 }
 \usage{
-manage(init, epistep, vacgrid, costs, T = 40, 
+manage(init, epistep, vacgrid, costs, T = 40, Tstop = T, 
      pinit = list(b = 0.1, k = 0.02, nu = 0.2, mu = 0.1), 
      hyper = list(bh = c(1,3), kh = c(1,3), nuh = c(1,1), muh = c(1,1)),
      vac0=list(frac=0, stop=0), MCvits = 10, MCMCpits = 1000, 
@@ -19,11 +19,14 @@ manage(init, epistep, vacgrid, costs, T = 40,
   \item{init}{ a \code{list} containing scalar entries \code{$S0},
     \code{$I0}, \code{$R0}, \code{$D0} depicting the initial number of
     susceptibles, infecteds, recovereds, and dead individuals in the
-    outbreak }
+    outbreak; an \code{"epiman"} object may also be provided in order
+    to continue managing an ongoing epidemic (see Details) }
   \item{epistep}{ a function which moves the epidemic ahead one
-  time-step; see \code{\link{epistep}} }
-  \item{T}{ the maximum number of time steps during which the epidemic
-   is allowed to evolve }
+    time-step; see \code{\link{epistep}} }
+  \item{T}{ the long-term horizon used to calculate optimal
+    vaccination strategies }
+  \item{Tstop}{ the maximum number of time steps during which the epidemic
+   is allowed to evolve; default is identical to \code{T} }
  \item{vacgrid}{ a \code{list} containing vector entries \code{$fracs} and
   \code{$stops} indicating the permissible fractions (in [0,1])
   of the population to be vaccinated and the (positive integer) of
@@ -86,6 +89,12 @@ manage(init, epistep, vacgrid, costs, T = 40,
   Parameter estimation (alone) can be performed by specifying the
   \dQuote{null} vaccination grid \code{vacgrid = NULL},
   i.e., with \code{vac0}.
+
+  It is possible to \dQuote{continue} managing an epidemic by specifying
+  the output of \code{manage}, an \code{"epiman"}-class object, as the
+  \code{init} argument and specifying a finishing time (\code{T}) which
+  is greater than the finishing time used to create the object (in the
+  previous call to \code{manage}); see example below.
   
   For more details on the parameterization and simulation of the
   SIR model, etc., and the calculation of the optimal vaccination
@@ -104,6 +113,8 @@ manage(init, epistep, vacgrid, costs, T = 40,
     time step; the total number vaccinated (\code{$V}), or culled
     (\code{$QC}, not supported in this version); and the corresponding
     cumulative cost of the epidemic (\code{$C} so far) }
+  \item{prime}{ a \code{data.frame} describing the changes in susceptibles
+    and infecteds due to a vaccination strategy }
   \item{vacgrid }{ a copy of the input \code{vacgrid} }
   \item{pols }{ a \code{data.frame} describing the policy enacted at
     each time step with columns giving the fraction of the
@@ -164,6 +175,12 @@ plot(out.man, type="params", true=true)
 ## Bobby isnt really sure what this is plotting
 plot(out.man, type="fracs")
 plot(out.man, type="stops")
+
+## managing an epidemic in two stages
+out.man <- manage(init, epistep, vacgrid, costs, Tstop=10)
+plot(out.man)
+out.man <- manage(out.man, epistep, vacgrid, costs, Tstop=20)
+plot(out.man)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

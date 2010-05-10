@@ -13,15 +13,15 @@ SimulateEpidemic = function(init,T,params,vacc,vaccstop,costs,starttime, ...)
         k = as.double(params$k),
         nu = as.double(params$nu),
         mu = as.double(params$mu),
-        vacc=as.double(vacc),
-        vaccstop=as.integer(vaccstop),
+        vacc = as.double(vacc),
+        vaccstop = as.integer(vaccstop),
         cvacc = as.double(costs$vac),
         cdeath = as.double(costs$death),
         cinfected = as.double(costs$infect),
-        starttime=as.integer(starttime),
-        PACKAGE="amei")
+        starttime = as.integer(starttime),
+        PACKAGE = "amei")
     } else {
-
+      
       ## params is an epistep
       epistep <- params
       
@@ -30,13 +30,13 @@ SimulateEpidemic = function(init,T,params,vacc,vaccstop,costs,starttime, ...)
       
       ## initialize the prime data frame
       prime <- data.frame(matrix(0, ncol=2, nrow=T))
-      names(prime)<-c("S", "I")
-
+      names(prime) <- c("S", "I")
+      
       ## get the initial last setting in epistep
       last <- formals(epistep)$last
-
+      
       for( i in 2:T ){
-
+        
         ## deal with starttime
         if(i <= starttime) { VAC <- 0; STOP <- 0 }
         else { VAC <- vacc; STOP <- vaccstop }
@@ -85,9 +85,9 @@ VarStopTimePolicy = function(S0,I0,T,b,k,nu,mu,cvacc,cdeath,cinfected,
       Vstops = as.integer(Vstops),
       nVstops = as.integer(length(Vstops)),
       EC = double(length(Vprobs)*length(Vstops)),
-      midepidemic=as.integer(midepidemic),
-      starttime=as.integer(starttime),
-      PACKAGE="amei")
+      midepidemic = as.integer(midepidemic),
+      starttime = as.integer(starttime),
+      PACKAGE = "amei")
     C <- matrix(cout$EC,length(Vprobs),length(Vstops),byrow=TRUE)
     return(C)
   }
@@ -108,9 +108,9 @@ SimulateManagementQuantiles <- function(epistep,Time,init, pinit, hyper, vac0,
     for(n in 1:nreps)
       {
         if(verb) cat("*** Simulating epidemic",n,"***\n")
-        foo <- manage(epistep=epistep,pinit=pinit,T=Time,init=init,hyper=hyper,
-                          vac0, costs=costs, MCMCpits=MCMCpits, bkrate=bkrate,
-                          vacsamps=vacsamps, vacgrid=vacgrid, start=start, ...)
+        foo <- manage(epistep=epistep,pinit=pinit,T=Time,Tstop=Time,init=init,
+                      hyper=hyper, vac0, costs=costs, MCMCpits=MCMCpits, bkrate=bkrate,
+                      vacsamps=vacsamps, vacgrid=vacgrid, start=start, ...)
         Sall[,n] = foo$soln$S
         Iall[,n] = foo$soln$I
         Rall[,n] = foo$soln$R
@@ -161,9 +161,6 @@ SimulateManagementQuantiles <- function(epistep,Time,init, pinit, hyper, vac0,
          Q3 = data.frame(S=SQ3,I=IQ3,R=RQ3,D=DQ3,V=VQ3,C=CQ3,frac=PolQ3[,1],stop=PolQ3[,2]))       
   }
 
-
-  
-
 SimulateEpidemicQuantiles = function(init,T,params,vacc,vaccstop,costs,
   nreps,lowerq,upperq,midepidemic,starttime)
   {
@@ -175,29 +172,29 @@ SimulateEpidemicQuantiles = function(init,T,params,vacc,vaccstop,costs,
     Call = matrix(0,T,nreps)
     for(n in 1:nreps)
       {
-        blah=TRUE;blahcount=0
-        while(blah)
+        isvalid = TRUE;isvalidcount=0
+        while(isvalid)
           {
-            foo = SimulateEpidemic(init,T,params,vacc,vaccstop,costs,starttime)
+            tmpsim = SimulateEpidemic(init,T,params,vacc,vaccstop,costs,starttime)
             if(!midepidemic)
               {
-                blahcount = blahcount+1
-                if(foo$I[starttime-1]>init$I)##sum(foo$I[-1]>foo$I[1])>1 | (b<=0 | k<=0) | vacc==1 | midepidemic)
-                  blah=FALSE
-                if(blahcount==100)
+                isvalidcount = isvalidcount+1
+                if(tmpsim$I[starttime-1]>init$I)
+                  isvalid = FALSE
+                if(isvalidcount==100)
                   {
                     cat("Warning: <1% chance of an epidemic\n")
-                    blah=FALSE
+                    isvalid=FALSE
                   }
               }
                 
           }
-        Sall[,n] = foo$S
-        Iall[,n] = foo$I
-        Rall[,n] = foo$R
-        Dall[,n] = foo$D
-        Vall[,n] = foo$V
-        Call[,n] = foo$C
+        Sall[,n] = tmpsim$S
+        Iall[,n] = tmpsim$I
+        Rall[,n] = tmpsim$R
+        Dall[,n] = tmpsim$D
+        Vall[,n] = tmpsim$V
+        Call[,n] = tmpsim$C
       }
 
     SQ1 = apply(Sall,1,quantile,prob=lowerq)

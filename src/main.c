@@ -81,7 +81,6 @@
 /*				  the algorithm to converge		*/
 /*									*/
 /*									*/
-/* USAGE:								*/
 /************************************************************************/
 
 #include <stdio.h>
@@ -89,76 +88,56 @@
 #include <math.h>
 #include "matrix.h"
 #include "ssdiff.h"
-//#include "rand_draws.h"
 #include "state.h"
 #include <R.h>
 #include <Rmath.h>
 
-//#define PI		3.14159265358979323846
 #define mcits		100
 #define thresh		10e-3
 #define maxiters	100
 
-void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in, 
-		  double *nu_in, double *q_in, double *ci_in, double *cv_in, 
-		  double *cd_in, double *thresh_in, int *mcits_in, 
-		  int *maxiters_in,
-		  double *V_in, double *V_out, double *alpha_out, 
-		  double *alpha_num_out, int* numiters);
 
 double **initializeVold(State state, int *index1, int *index2, double *itilde,
-			int mymcits);
+			int mymcits)
+{
+  double        **Vold;
+  double	sum, prob;
+  int		j;
+  
+  Vold = new_zero_matrix(state.N+1,state.N+1);
+  
+  for( state.s = 0; state.s <= (state.N-1); state.s++ ){
+    for( state.i = 1; state.i <= (state.N - state.s); state.i++ ){   
+      /* sample from the distribution of new infecteds*/
+      
+      prob = inf_prob(state); 
+      for( j = 0; j < mymcits; j++ ) itilde[j] = rbinom(state.s, prob);
 
-/* int main (void /\*int argc, const char * argv[]*\/) { */
-/*   float	b, k, mu, nu, q, ci, cv, cd, mythresh; */
-/*   int	N, mymaxiters; */
-/*   int   mymcits[2]; */
-  
-/*   printf("Please input the following parameter values:\n\n"); */
-/*   printf("\nInitial population size, N: "); */
-/*   scanf("%d", &N); */
-/*   printf("\nTransmission parameter, b: "); */
-/*   scanf("%f", &b); */
-/*   printf("\nInteraction parameter, k: "); */
-/*   scanf("%f", &k); */
-/*   printf("\nMortality rate, mu: "); */
-/*   scanf("%f", &mu); */
-/*   printf("\nRecovery rate, nu: "); */
-/*   scanf("%f", &nu); */
-/*   printf("\nProbibility of death from vaccination, q: "); */
-/*   scanf("%f", &q); */
-/*   printf("\nCost of infection, in dollars, ci: "); */
-/*   scanf("%f", &ci); */
-/*   printf("\nCost of vaccination, in dollars, cv: "); */
-/*   scanf("%f", &cv); */
-/*   printf("\nCost of a single death, in dollars, cd: "); */
-/*   scanf("%f", &cd); */
-  
-/*   printf("\nThese are the parameters you entered: \n" \ */
-/* 	 "N = %d \n b = %f \n k = %f \n mu = %f \n" \ */
-/* 	 "nu = %f \n q= %f ci = %f cv = %f cd = %f\n\n",  */
-/* 	 N, b, k, mu, nu, q, ci, cv, cd); */
-  
-/*   mythresh = thresh; */
-/*   mymcits[0]= mcits; */
-/*   mymcits[1]= 10*10*10*mcits; */
-/*   mymaxiters = maxiters; */
-
-/*   newvacpolicy(&N, (double*) &b, (double*) &k, (double*) &mu,  */
-/* 	       (double*) &nu, (double*) &q,(double*) &ci,  */
-/* 	       (double*) &cv, (double*) &cd, (double*) &mythresh,  */
-/* 	       (int*) &mymcits, (int*) &mymaxiters,  */
-/* 	       NULL, NULL, NULL, NULL, NULL); */
-  
-/*   return 0; */
-/* } */
+      /* store the expected number of deaths without vaccination using  */
+      /* Monte Carlo simulation to compute the expectation of Vold over */
+      /* itilde.							*/
+      for( j = 0; j < mymcits; j++ ){
+	index1[j] = (int) (remaining_inf(state) + itilde[j]);
+	index2[j] = (int) (state.s-itilde[j]);
+      }
+      
+      sum = 0;
+      for( j = 0; j < mymcits; j++) sum = sum + Vold[index1[j]][index2[j]];
+      
+      /* recursively compute the expected number of deaths using Monte  */ 
+      /* Carlo estimation for the expectation of Vold over itilde	*/
+      
+      Vold[state.i][state.s] = cost_inf(state) + sum/(mymcits);
+    }
+  }
+  return Vold;
+}
 
 
 void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in, 
 		  double *nu_in, double *q_in, double *ci_in, double *cv_in, 
 		  double *cd_in, double *thresh_in, int *mcits_in, 
 		  int *maxiters_in, double *V_in, 
-		  
 		  double *V_out, double *alpha_out, 
 		  double *alpha_num_out, int *numiters)
 {
@@ -170,7 +149,7 @@ void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in,
   int		*index1, *index2;
 
   lastdiff= 1e300*1e300;
-	
+  
   State state;
   state.N = *N_in; state.b = *b_in; state.k = *k_in; state.mu = *mu_in; 
   state.nu = *nu_in, state.q = *q_in, state.ci=*ci_in, state.cv=*cv_in; 
@@ -203,14 +182,11 @@ void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in,
 	  /* sample from the distribution of new infecteds */
 	  prob = inf_prob(state); 
 	  suscept = floor(postvac_suscept(state)); 
-	  //for( j = 0; j < mcits_in[0]; j++ ) itilde[j] = bnldev( prob, suscept );
 	  for( j = 0; j < mcits_in[0]; j++ ) itilde[j] = rbinom(suscept,prob);
 
 	  /* store the expected number of deaths under for that vaccination  */
 	  /* policy using Monte Carlo simulation to compute the expectation  */
 	  /* of Vold over itilde.	  			             */
-	  /* mean(Vold[floor(i*exp(-nu-mu)+itilde+1),                        */
-	  /* floor(s*(1-a/100)-itilde+1)]))                                  */
 	  for( j = 0; j < mcits_in[0]; j++ ){
 	    index1[j] = (int) (remaining_inf(state)+itilde[j]);
 	    index2[j] = (int) (postvac_suscept(state)-itilde[j]);
@@ -219,9 +195,6 @@ void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in,
 	  sum = 0;
 	  for( j = 0; j < mcits_in[0]; j++)sum = sum + Vold[index1[j]][index2[j]];
 	  
-	  /* alphavals[a+1]<-(a/100*q*s+i*(1-exp(-nu-mu))*mu/(nu+mu)+ 	    */
-	  /* mean(Vold[floor(i*exp(-nu-mu)+itilde+1),                       */
-	  /* floor(s*(1-a/100)-itilde+1)]))                                 */
 	  alphavals[state.a] = cost_vac(state) + cost_inf(state) + sum/(mcits_in[0]);
 	}
 	
@@ -279,13 +252,6 @@ void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in,
   
   /* at this point, Vnew should have the optimal expected deaths and   	*/
   /* alpha should have the optimal vaccination fractions       		*/
-  
-  /*printf("\n number of iterations: %d \n\n", iters);*/
-  
-  /*printf("Vnew = \n");
-    printMatrix(Vnew, N+1, N+1, stdout);
-    printf("\nalpha = \n");
-    printMatrix(alpha, N+1, N+1, stdout);*/
 
   *numiters = iters;
   
@@ -305,40 +271,3 @@ void newvacpolicy(int *N_in, double *b_in, double* k_in, double *mu_in,
 
 
 
-double **initializeVold(State state, int *index1, int *index2, double *itilde,
-			int mymcits)
-{
-  double        **Vold;
-  double	sum, prob;
-  int		j;
-
-  Vold = new_zero_matrix(state.N+1,state.N+1);
-  
-  for( state.s = 0; state.s <= (state.N-1); state.s++ ){
-    for( state.i = 1; state.i <= (state.N - state.s); state.i++ ){   
-      /* sample from the distribution of new infecteds*/
-      
-      prob = inf_prob(state); 
-      //      for( j = 0; j < mymcits; j++ ) itilde[j] = bnldev(prob, state.s);
-      for( j = 0; j < mymcits; j++ ) itilde[j] = rbinom(state.s, prob);
-
-      /* store the expected number of deaths without vaccination using  */
-      /* Monte Carlo simulation to compute the expectation of Vold over */
-      /* itilde.							*/
-      /* mean(Vold[floor(i*exp(-nu-mu)+itilde+1), floor(s-itilde+1)])	*/
-      for( j = 0; j < mymcits; j++ ){
-	index1[j] = (int) (remaining_inf(state) + itilde[j]);
-	index2[j] = (int) (state.s-itilde[j]);
-      }
-      
-      sum = 0;
-      for( j = 0; j < mymcits; j++) sum = sum + Vold[index1[j]][index2[j]];
-      
-      /* recursively compute the expected number of deaths using Monte  */ 
-      /* Carlo estimation for the expectation of Vold over itilde	*/
-      
-      Vold[state.i][state.s] = cost_inf(state) + sum/(mymcits);
-    }
-  }
-  return Vold;
-}

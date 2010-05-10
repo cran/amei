@@ -1,5 +1,5 @@
-\documentclass{article}
-\usepackage[footnotesize]{caption}
+\documentclass[shortnames,nojss]{jss}
+\usepackage{thumbpdf}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amscd}
@@ -12,8 +12,7 @@
 %\VignetteKeywords{amei}
 %\VignetteDepends{amei}
 %\VignettePackage{amei}
-
-\begin{document}
+%% need no \usepackage{Sweave.sty}
 
 %\doublespacing
 
@@ -24,30 +23,25 @@ library(amei)
 options(width=60)
 @ 
 
-\title{{\tt amei}: an {\sf R} package for the Adaptive\\ 
+\title{\pkg{amei}: an \proglang{R} package for the Adaptive\\ 
   Management of Epidemiological Interventions}
-\author{
-  Daniel Merl\\
-  Department of Statistical Science\\
-  Duke University, Durham NC\\
-  dan@stat.duke.edu \and
-  Leah R.~Johnson\\
-  Department of Ecology, Evolution, and Marine Biology\\
-  University of California, Santa Barbara\\
-  lrjohnson@lifesci.ucsb.edu \and
-  Robert B.~Gramacy\\
-  Statistical Laboratory\\
-  University of Cambridge, United Kingdom\\
-  bobby@statslab.cam.ac.uk \and
-  Marc S.~Mangel\\
-  Center for Biomolecular Science and Engineering, and\\
-  Department of Applied Mathematics and Statistics\\
-  University of California, Santa Cruz\\
-  msmangel@ams.ucsc.edu}
-\maketitle
+\author{Daniel Merl\\
+  Lawrence Livermore National Lab
+ \And Leah R.~Johnson\\
+ University of California, Santa Barbara
+  \AND Robert B.~Gramacy\\
+  University of Cambridge
+  \And Marc Mangel\\
+ University of California, Santa Cruz}
+%\maketitle
 
-\begin{abstract}
-  The {\tt amei} package for {\sf R} \cite{cran:R} is a tool that
+\Plainauthor{Daniel Merl, Leah R.Johnson, Robert B. Gramacy and Marc Mangel}
+\Plaintitle{amei: An R package for the Adaptive Management of 
+  Epidemiological Interventions}
+\Shorttitle{\pkg{amei}: An \proglang{R} package for the Adaptive
+  Management of Epidemiological Interventions}
+
+\Abstract{The \pkg{amei} package for \proglang{R} is a tool that
   provides a flexible statistical framework for generating optimal
   epidemiological interventions that are designed to minimize the
   total expected cost of an emerging epidemic. Uncertainty regarding
@@ -56,63 +50,94 @@ options(width=60)
   produced through this framework are adaptive: vaccination schedules
   are iteratively adjusted to reflect the anticipated trajectory of
   the epidemic given the current population state and updated
-  parameter estimates.  This document briefly covers the background and
-  methodology underpinning the implementation provided by the package
-  and contains an extensive example showing the functions and methods
-  in action.
-\end{abstract}
+  parameter estimates.  This document briefly covers the background
+  and methodology underpinning the implementation provided by the
+  package and contains extensive examples showing the functions and
+  methods in action.}
 
-\subsection*{Intended audience}
-\label{sec:discaimer}
+\Keywords{SIR model, Bayesian inference, optimal decisions, Markov chain
+Monte Carlo}
+\Plainkeywords{SIR model, Bayesian inference, optimal decisions,
+  Markov chain Monte Carlo}
 
-This document is intended to familiarize a (potential) user of {\tt
-  amei} with the models implemented and analyses available in the
-package.  After a brief overview, the bulk of this document consists
-of a detailed example illustrating the various functions and
-methodologies implemented. This document has been authored in {\tt
-  Sweave} (try {\tt help(Sweave)}).  This means that the code quoted
-throughout is certified by {\sf R}, and the {\tt Stangle} command can
-be used to extract it.  The demo available in this package will run
-the same code via \verb!demo("amei")!.
+\Submitdate{0000-00-00}
+\Acceptdate{0000-00-00}
 
-Note that this tutorial was not meant to serve as an instruction
-manual.  For more detailed documentation of the functions contained in
-the package, see the package help--manuals. At an {\sf R} prompt, type
-{\tt help(package=amei)}. PDF documentation is also available on the
-world-wide-web.
-\begin{center}
-\tt http://www.cran.r-project.org/web/packages/amei/index.html
-\end{center}
+\Address{
+Daniel Merl\\
+Systems and Intelligence Analysis\\
+Lawrence Livermore National Laboratory\\
+Livermore, CA 94551\\
+USA\\
+E-mail: \email{merl1@llnl.gov}\\
+\\
+Leah R. Johnson\\
+Ecology, Evolution, and Marine Biology\\
+University of California, Santa Barbara\\
+Santa Barbara, CA 93106\\
+USA\\
+E-mail: \email{lrjohnson@lifesci.ucsb.edu}\\
+URL: \url{http://www.lifesci.ucsb.edu/~lrjohnson/}\\
+\\
+Robert B. Gramacy\\
+Statistical Laboratory\\
+University of Cambridge\\
+Wilberforce Road\\
+Cambridge, CB3 0WB\\
+United Kingdom\\
+E-mail: \email{bobby@statslab.cam.ac.uk}\\
+URL: \url{http://www.statslab.cam.ac.uk/~bobby}\\
+\\
+Marc Mangel\\
+Department Applied Mathematics and Statistics\\
+The Jack Baskin School of Engineering\\
+University of California, Santa Cruz\\
+Santa Cruz, CA 95064\\
+USA\\
+E-mail: \email{msmangel@ucsc.edu}\\
+URL: \url{http://users.soe.ucsc.edu/~msmangel/}
+}
 
-This tutorial is comprised of four main sections.  Section
-\ref{sec:motivate} provides some background and motivation.  The
-mathematical specification of the Bayesian models used for inference
-and the Monte Carlo methods for constructing optimal vaccination
-strategies (both static or adaptive and on--line) are contained in
-Section \ref{sec:methods}.  In Section \ref{sec:pnas}, the functions
-and methods implemented in the package are illustrated by following a
-single, detailed, example, whose results were first reported by Merl
-et al.,~\cite{merl08}.  The paper concludes in Section
-\ref{sec:discuss} with a discussion of the methodology and related
-work highlighting other freely available software with comparisons and
-contrasts.  Miscellaneous details on implementation, etc., are
-provided in an appendix.
+\begin{document}
 
-\section{Motivation}
+% \subsection*{Intended audience}
+% \label{sec:discaimer}
+
+% This document is intended to familiarize a (potential) user of
+% \pkg{amei} with the models implemented and analyses available in
+% the package.  After a brief overview, the bulk of this document
+% consists of a detailed example illustrating the various functions and
+% methodologies implemented. This document has been authored in
+% \pkg{Sweave} (try \code{help(Sweave)}).  This means that the code
+% quoted throughout is certified by \proglang{R}, and the \code{Stangle}
+% command can be used to extract it.  The demo available in this package
+% will run the same code via \verb!demo("amei")!.
+
+% Note that this tutorial was not meant to serve as an instruction
+% manual.  For more detailed documentation of the functions contained in
+% the package, see the package help--manuals. At an \proglang{R} prompt, type
+% \code{help(package=amei)}. PDF documentation is also available on the
+% world-wide-web.
+% \begin{center}
+% \tt http://www.cran.r-project.org/web/packages/amei/index.html
+% \end{center}
+
+
+\section{Introduction}
 \label{sec:motivate}
 
 
 The goal of the study of infectious diseases is to better understand
 how infections are spread and maintained, and ultimately to find ways
 to control the spread of a disease. The most common methods for
-intervening in the spread of an infectious disease either remove
+intervening in the spread of an infectious disease are to either remove
 susceptible individuals or apply treatment to infected
 individuals. For instance, the susceptible population may be culled,
 as in the case of foot-and-mouth disease
-\cite{tildesley06,enserink01}, or the infected population may be
-quarantined, as in the case of SARS \cite{lloyd-smith03}. Most
+\citep{tildesley06,enserink01}, or the infected population may be
+quarantined, as in the case of SARS \citep{lloyd-smith03}. Most
 commonly, susceptibles may be vaccinated, as in the case with
-influenza or smallpox \cite{ferguson03,halloran02}.
+influenza or smallpox \citep{ferguson03,halloran02}.
 
 Each of these actions incurs a quantifiable epidemiological cost.  For
 culling, the cost is an additional number of deaths; for quarantine,
@@ -128,18 +153,18 @@ adaptively depends on the state of the epidemic.
 Most existing methods for finding optimal intervention strategies are
 concerned with the situation of pre-emptive intervention which is
 assumed to be completed before the onset of the epidemic (for instance
-see \cite{ball02,patel05,tildesley06}).  In this kind of situation,
+see \citet{ball02,patel05,tildesley06}).  In this kind of situation,
 there is no reason to consider sequentially updated (i.e. adaptive)
 interventions: as soon as the intervention policy is triggered, the
 epidemic threat will be eradicated.  However, in most scenarios, total
 and instantaneous intervention will not be an implementable strategy.
 Moreover, these methods usually involve calculations that assume no
 uncertainty in key model parameters, including transmission rate,
-recovery rate, and others (however, see Elderd, et al.~\cite{elderd06}
-and our brief discussion in Section \ref{sec:discuss}).
+recovery rate, and others (however, see \citet{elderd06}
+and our brief discussion in Section~\ref{sec:discuss}).
 
-Here we introduce {\tt amei}, a software package that implements a
-statistical framework introduced by Merl, et al.~\cite{merl08}, that
+Here we introduce \pkg{amei}, a software package that implements a
+statistical framework introduced by \citet{merl09}, that
 allows one to respond to an emerging epidemic while simultaneously
 learning about it.  We consider vaccination strategies defined by a
 fraction of the current susceptible population to be targeted for
@@ -151,13 +176,28 @@ epidemic model, thereby propagating parameter uncertainty through to
 policy decisions. We demonstrate the advantages of adaptive
 intervention via the functions provided by the package using
 simulations modeled after an influenza outbreak at a British boarding
-school described by Murray \cite{murray02}. We compare the
+school described by \citet{murray02}. We compare the
 distribution of costs arising from epidemiological intervention under
 the adaptive policies to those arising from non-adaptive policies
 (i.e. policies not dependent on the state of the epidemic and/or not
 reflecting parameter uncertainty), and find that the adaptive policies
 result in low total costs, efficient use of available resources,
 and are robust to model misspecification.
+
+This tutorial is comprised of three main sections.  The mathematical
+specification of the Bayesian models used for inference and the Monte
+Carlo methods for constructing optimal vaccination strategies (both
+static or adaptive and on--line) are contained in
+Section~\ref{sec:methods}.  In Section~\ref{sec:pnas}, the functions
+and methods implemented in the package are illustrated by following a
+single, detailed, example, whose results were first reported by
+\citet{merl09}.  Section \ref{sec:alt} contains a second example with
+an alternative transmission model, thereby illustrating the additional
+benefits of the approach and features of the package.  The paper
+concludes in Section \ref{sec:discuss} with a discussion of the
+methodology and related work highlighting other freely available
+software with comparisons and contrasts.  Miscellaneous details on
+implementation, etc., are provided in an appendix.
 
 % {\bf Maybe we should say somewhere that by calculating the stopping
 %   number, we put a cap on the total number of vaccine doses that we
@@ -170,20 +210,27 @@ and are robust to model misspecification.
 \subsection{SIR Model}
 \label{sec:sirmodel}
 
-In {\tt amei}, we consider a standard Susceptible--Infected--Removed
-(SIR) model \cite{anderson91,hetchote00} with permanent immunity and
-with mortality. In this model, the dynamic variables at time $t$ are
-the number of susceptible individuals, $S(t)$; the number of infected
+In \pkg{amei}, we consider a stochastic version of a standard
+Susceptible--Infected--Removed (SIR) model
+\citep{anderson91,hetchote00} with permanent immunity and with
+mortality. In this model, the dynamic variables at time $t$ are the
+number of susceptible individuals, $S(t)$; the number of infected
 individuals, $I(t)$; the number of recovered individuals, $R(t)$; and
-the number of removed/dead individuals, $D(t)$.  We assume the
-population is closed to immigration or emigration such that
-$S(t)+I(t)+R(t)+D(t)=N$, where $N$ is constant.
+the number of removed/dead individuals, $D(t)$. In a standard SIR
+model we would typically lump all of the Recovered and Dead
+individuals into a single removed class. However, in controlling an
+epidemic we expect there to be differential costs associated with
+deaths versus other types of removal (see below), so we count the
+numbers of deaths separately. We assume the population is closed to
+immigration or emigration so that $S(t)+I(t)+R(t)+D(t)=N$, where $N$
+is constant.
 
 Models of this type can include transmission dynamics ranging from the
 very simple to the very complex. We adopt a flexible negative binomial
-form for the transmission function \cite{mccallum01}. Under this
-assumption, the SIR model is described by the following system of
-differential equations \cite{hetchote00,mccallum01}:
+form for the transmission function
+\citep{godfray89,mangel06,mccallum01}. Under this assumption, the SIR
+model is described by the following system of differential equations
+\citep{hetchote00,mccallum01}:
 \begin{align}
   \frac{\mathrm{d}S}{\mathrm{d}t} &=
 -kS \ln\left(1+\frac{bI}{k}\right) \label{dS} \\
@@ -207,16 +254,22 @@ explicit characterization of the population structure.
 This SIR formulation leads to a natural discrete time approximation
 for the numbers of infections ($\tilde{I}$), recoveries ($\tilde{R})$,
 and deaths ($\tilde{D}$) arising in the unit time interval from $t$ to
-$t+1$. Holding the total number of infected individuals, $I$, constant
-and integrating Eq.~(\ref{dS}) over a unit time interval gives
+$t+1$. Assuming the total number of infected individuals, $I$, is
+approximately constant and integrating Eq.~(\ref{dS}) over a unit time
+interval gives
+\begin{equation}
+  S(t+1) = S(t) \left[ \frac{k}{k+bI(t)} \right]^k, \label{eq:meanS}
+\end{equation}
+so that the fraction of susceptible individuals surviving throughout a
+unit time interval is $\left[ \frac{k}{k+bI(t)}\right]^k$.  Viewed as
+a discrete time stochastic process, where the mean number of remaining
+susceptible individuals is given by Eq.~(\ref{eq:meanS}), the number
+of new infections occurring between time $t$ and $t+1$ when $S(t)=s$
+and $I(t)=i$ with mean
 \[
-  S(t+1) = S(t) \left[ \frac{k}{k+bI(t)} \right]^k,
+  S(t)\left(1 - \left[ \frac{k}{k+bI(t)} \right]^k\right)
 \]
-so that the fraction of susceptible individuals surviving a unit time
-interval is $\left[ \frac{k}{k+bI(t)}\right]^k$.  Viewed as a discrete
-time stochastic process, the number of new infections occurring
-between time $t$ and $t+1$ when $S(t)=s$ and $I(t)=i$ can be 
-therefore described by
+can be described as a binomial process
 \begin{align}
   \tilde{I}|s,i &\sim \mbox{Bin}(s, p_i(i,b,k)), \label{bini}
   \intertext{where}
@@ -249,27 +302,30 @@ model.
 \subsection{Online Parameter Estimation}
 \label{sec:estimate}
 
-An important task of {\tt amei} is to be able to estimate the SIR
-model parameters. Given the discrete time approximation given in the
-previous section, it is possible to do this online (i.e., as the
-epidemic progresses) via straightforward parametric Bayesian methods.
-In particular, we use Markov Chain Monte Carlo (MCMC)
-\cite{gamerman06} to learn about the posterior distributions of $b$,
-$k$, $\nu$, and $\mu$ conditioned on the evolution of the epidemic
-observed so far.  The likelihood is given recursively in
+A primary task of \pkg{amei} is to perform inference on the SIR model
+parameters, conditional on sequential observations of the numbers of
+susceptible, infected, and recovered individuals in the population.
+Given the discrete time approximation in the previous section, it is
+possible to do this online (i.e., as the epidemic progresses) via
+straightforward parametric Bayesian methods.  In particular, we use
+Markov Chain Monte Carlo (MCMC) \citep[e.g.,][]{gamerman06} to learn
+about the posterior distributions of $b$, $k$, $\nu$, and $\mu$
+conditioned on the evolution of the epidemic observed so far.  The
+likelihood is given recursively in
 Eq.~(\ref{bini}--\ref{dtilde}). % Assume, at first, that no intervention
 %strategy is implemented.  
 Let $\tilde{i}_t = S(t-1) - S(t)$ be the number of new infecteds at
 time $T$, and similarly for the newly recovered and dead individuals
 $\tilde{r}_t$ and $\tilde{d}_t$ so that $\tilde{r}_t + \tilde{d}_t
-\leq I(t-1)$.  Then, the likelihood up to time $T$ is given by
+\leq I(t-1)$.  Then, the likelihood of the data observed up to time
+$T$ is given by
 \begin{align*}
 &\prod_{t=1}^T \mbox{Bin}(\tilde{i}_t \,| S(t-1), p_i(I(t-1),b,k))\\
 &\times \prod_{t=1}^T \mbox{Bin}(\tilde{r}_t | p_r)
-\times \prod_{t=1}^T \mbox{Bin}(\tilde{d}_t | I(t)-\tilde{r}_t, p_d)
+\times \prod_{t=1}^T \mbox{Bin}(\tilde{d}_t | I(t)-\tilde{r}_t, p_d).
 \end{align*}
-and we can see that it consists of three mutually independent
-components.  
+Observe that it consists of three mutually independent components when
+conditioning on the course of the epidemic.
 
 Conditional conjugacy can be exploited for $\nu$ and $\mu$ via beta
 priors for $p_r$ and $p_d$. A Beta$(\alpha_r, \beta_r)$ prior for
@@ -307,20 +363,20 @@ can be obtained by Metropolis--within--Gibbs steps using:
   p(b'&| k,\dots) \\
 & \propto \Gamma[b' | \alpha_b,\beta_b] \prod_{t=1}^T
   \mbox{Bin}(\tilde{i}_t \,|\,
-  S(t-1), p_i(I(t-1),b',k)) \nonumber \\
+  S(t-1), p_i(I(t-1),b',k)), && \mbox{and} \nonumber \\
   p(k'&| b',\dots) \\
 &\propto \Gamma[k' | \alpha_k,\beta_k] \prod_{t=1}^T
   \mbox{Bin}(\tilde{i}_t \,|\, S(t-1), p_i(I(t-1),b',k')). \nonumber
 \end{align}
-For the prior settings, the default values set in the package are
-$(\alpha_b, \beta_b) = (\alpha_k, \beta_k) = (1, 3)$ which (though
+The default values for the prior parameterization set in the package
+are $(\alpha_b, \beta_b) = (\alpha_k, \beta_k) = (1, 3)$ which (though
 seemingly informative at first glance) turns out to be uninformative
 on the scale of the support of the posterior.  As before, these can
 easily be changed by the user.  We use random walk uniform proposals
 on the positive real line, i.e., $b' \sim U[3b/4,4b/3]$, which gives
-reasonably good mixing from the Markov chain.
+reasonably good mixing in the Markov chain.
 
-In the presence of a vaccination strategy (described in the next
+The presence of a vaccination strategy (described in the next
 section) necessitates a simple change to the above equations.  If $0
 \leq v_t \leq S(t-1)$ is the number of susceptibles which have been
 vaccinated, then we simply replace $S(t-1)$ with $S(t-1) - v_t$
@@ -329,32 +385,34 @@ so that $\tilde{i}_t=S(t-1)-v_t-S(t)$.
 \subsection{Optimal Vaccination Strategies: Fixed and Adaptive}
 \label{sec:optvac}
 
-Once we know, or have estimated, the SIR model parameters at some time
+Having obtained estimates of the SIR model parameters at some time
 during the epidemic, we next want find the best way to intervene in
-the spread of the epidemic. The first step is to define what we mean
-by the ``best'' strategy. This requires a specification of the costs of
-various actions, such as vaccination, verses the cost of allowing the
-epidemic to spread in an uncontrolled fashion. In {\tt amei}, we
-formulate the total expected cost of the epidemic in terms of the
-underlying costs associated with maintaining infected individuals
-until recovery, suffering death, and administering vaccinations. As it
-is currently formulated, these costs must all be in some common
-currency (such as monetary cost, or simply numbers of deaths).
+the spread of the epidemic. The first step is to formalize the notion
+of the ``best'' intervention strategy. This requires a specification
+of the costs of various actions, such as vaccination, versus the cost
+of allowing the epidemic to spread in an uncontrolled fashion. In
+\pkg{amei}, we formulate the total expected cost of the epidemic in
+terms of the underlying costs associated with maintaining infected
+individuals until recovery, suffering death, and administering
+vaccinations. We assume costs associated with each action can be
+specified in some common currency, such as monetary costs, or
+probabilities of mortality (such that the cost to be minimized is the
+expected numbers of deaths).
 
-We have formulated our costs and vaccination strategies in terms of a
-policy where a fraction, $\alpha$, of susceptibles are prevented from
-risk of infection by moving them directly into an immune/recovered
-class, such as by perfect vaccination, until the number of individuals
-that are still susceptible drop below a threshold, $\gamma$, and
-vaccination is discontinued. We let $c_1(\alpha,\gamma, s)$ denote the
-cost associated with the vaccination strategy $(\alpha,\gamma)$ when
-$S(t)=s$.  Letting $c_v$ denote the cost per vaccine unit, then
+We formulate our vaccination strategies in terms of a policy where a
+fraction, $\alpha$, of susceptibles are prevented from risk of
+infection by moving them directly into an immune/recovered class, such
+as by perfect vaccination, until the number of individuals that are
+still susceptible drop below a threshold, $\gamma$, and vaccination is
+discontinued. Let $c_1(\alpha,\gamma, s)$ denote the cost associated
+with the vaccination strategy $(\alpha,\gamma)$ when $S(t)=s$.  If
+$c_v$ denotes the cost per vaccine unit, then
 \[
  c_1(\alpha,\gamma,s) = \left\{ \begin{array}{ll}c_v \alpha s &\mbox{ if }
-  s>\gamma\\ 0 &\mbox{ if } s\leq \gamma \end{array}\right.
+  s>\gamma\\ 0 &\mbox{ if } s\leq \gamma. \end{array}\right.
 \]
-
-We let $c_2(i)$ denote the cost component that depends on the number
+Thus the number if individuals vaccinated at time $t$ is $v_t=\alpha
+s$. Let $c_2(i)$ denote the cost component that depends on the number
 of infections in the population, $I(t)=i$.  This component includes
 the costs associated with maintaining the non-recovered infected
 individuals and costs associated with deaths, as in
@@ -369,58 +427,61 @@ Assuming the initial epidemiological state is $S(0)=s_0$, $I(0)=i_0$,
 the expected total cost of the epidemic under intervention strategy
 $(\alpha, \gamma)$ can be expressed recursively as
 \begin{equation}
-E\{C_0\} = c_1(\alpha,\gamma, s_0) + c_2(i_0)+ E\{ C_{1} \},\label{sdp}
+\E\{C_0\} = c_1(\alpha,\gamma, s_0) + c_2(i_0)+ \E\{ C_{1} \},\label{sdp}
 \end{equation}
-where $E\{ C_t\}$ denotes the expected cost accumulated from time $t$
-onwards.  The optimal intervention strategy $(\alpha,\gamma)$ is the
-one that minimizes the total accumulated cost over the course of the
-epidemic.  Two methods for calculating such strategies are as follows.
+where $\E\{ C_t\}$ denotes the expected cost accumulated from time $t$
+onwards, terminating at some arbitrary time horizon.  The optimal
+intervention strategy $(\alpha,\gamma)$ is the one that minimizes the
+total accumulated cost over the course of the epidemic.  Two methods
+for calculating such strategies are as follows.
  
 The first case we are interested in is when the parameters of the SIR
-model are exactly known, and we wish to calculate the single best
-intervention strategy $(\alpha,\gamma)$ to use over the whole
-epidemic. The total expected cost depends on the parameter values and
-the initial epidemiological state $(s_0,i_0)$.  Thus, conditional on a
-set of parameter values, Monte Carlo simulation can be used to search
-over values of $\alpha$ and $\gamma$ in order to find the combination
-that minimizes $E\{C_0\}$.  For each combination of $\alpha$ and
-$\gamma$ considered, we conduct $n$ stochastic simulations of the
-outbreak in order to estimate the mean cost associated with the
-intervention $(\alpha,\gamma)$. The strategy producing the lowest mean
-cost is defined to be the optimal intervention. Typically we
-discretize and create a grid of admissible $\alpha$ and $\gamma$
-settings.  In the examples in Section \ref{sec:pnas} we allow $\alpha$
-to range from 0 to 1 in increments of $0.1$, and $\gamma$ to range
-from from 2 to $s_0-s_0/10$ in increments of $s_0/10$, i.e., taking 10
-steps.\footnote{We generally do not include $\gamma=s_0$ in the grid
-  since this policy (coupled with any $\alpha$) is equivalent to
-  $\alpha=0$ for any $\gamma$.}
+model are known, and we wish to calculate the single best intervention
+strategy $(\alpha,\gamma)$.  The total expected cost depends on the
+parameter values and the initial epidemiological state $(s_0,i_0)$.
+Thus, conditional on the parameter values, Monte Carlo simulation of
+the disease dynamics specified in Section~\ref{sec:sirmodel} 
+can be used to search over values of $\alpha$ and $\gamma$ in order to
+find the combination that minimizes $\E\{C_0\}$.  For each combination
+of $\alpha$ and $\gamma$ considered, we conduct $n$ stochastic
+simulations of the outbreak in order to estimate the mean cost
+associated with the intervention $(\alpha,\gamma)$. The strategy
+producing the lowest mean cost is defined to be the optimal
+intervention. Typically we discretize and create a grid of admissible
+$\alpha$ and $\gamma$ settings.  In the examples in
+Section~\ref{sec:pnas} we allow $\alpha$ to range from 0 to 1 in
+increments of $0.1$, and $\gamma$ to range from from 2 to $s_0-s_0/10$
+in increments of $s_0/10$, i.e., taking 10 steps.\footnote{We
+  generally do not include $\gamma=s_0$ in the grid since this policy
+  (coupled with any $\alpha$) is equivalent to $\alpha=0$ for any
+  $\gamma$.}
 
 In the second case, we want to calculate an adaptive strategy that
-updates the best strategy $(\alpha,\gamma)$ as we learn more about the
-epidemic over time. As above, the expected cost surface associated
-with a given set of parameter values (as obtained by MCMC, described
-above), can be explored using standard Monte Carlo methods.  At each
-time step, MCMC is used to produce samples from the current posterior
-distribution on model parameters.  These samples are used to calculate
-the optimal vaccination strategy as outlined as above, treating the
-current time step as time zero.  The adaptive strategy to be
+sequentially updates the best strategy $(\alpha,\gamma)$ as we learn
+more about the epidemic model parameters.  As above, the expected cost
+surface associated with a given set of parameter values (as obtained
+by MCMC, described above), can be explored using standard Monte Carlo
+methods.  At each time step, MCMC is used to produce samples from the
+current posterior distribution on model parameters conditional on all
+data observed up to that point.  These samples are used to calculate
+the optimal vaccination strategy from that time point onward, as
+outlined as above.  After calculating the optimal strategy associated
+with each set of posterior samples, the adaptive strategy to be
 implemented at that time step is defined to be the strategy that most
-frequently minimizes the cost over the samples from the posterior
-distribution of the parameters.
+frequently minimizes the expected cost over all samples.
 
 \section{An illustrative example}
 \label{sec:pnas}
 
 In this section we demonstrate the advantages of adaptive intervention
 using simulations modeled after an influenza outbreak at a British
-boarding school described by Murray \cite{murray02}.  We shall compare
+boarding school described by \citet{murray02}.  We shall compare
 the distribution of costs arising from epidemiological intervention
 under the adaptive policies to those arising from non-adaptive
 policies.  The epidemic conforms to many standard assumptions of SIR
 models: a population essentially closed to immigration and emigration;
 includes recovery and immunity; and has near homogeneous mixing of
-susceptibles and infectives.  The epidemic was traced back to a single
+susceptibles and infecteds.  The epidemic was traced back to a single
 infected student out of a population of 763 individuals.
 
 \SweaveInput{pnas.iRnw}
@@ -434,7 +495,7 @@ infected student out of a population of 763 individuals.
 %   -- we could probably incorporate some of the points from that paper
 %   here }
 
-Our {\tt amei} package for {\sf R} implements a statistical framework
+Our \pkg{amei} package for \proglang{R} implements a statistical framework
 that enables concurrent estimation of epidemic parameters and optimal
 intervention strategies. In particular, it allows parameter
 uncertainty to be taken into consideration when planning an
@@ -444,9 +505,9 @@ In the current implementation, we look for adaptive strategies of only
 one type---vaccination of proportions of the population until
 susceptibles fall below some threshold. However, if we were to instead
 allow the fraction of the population targeted for vaccination to be a
-function of future disease states we could regard Eq.~\ref{sdp} as a
+function of future disease states we could regard Eq.~(\ref{sdp}) as a
 stochastic iteration equation and use stochastic dynamic programming
-\cite{clark00} to calculate the optimal intervention associated with a
+\citep{clark00} to calculate the optimal intervention associated with a
 set of parameter values. Such an approach may be useful for situations
 in which knowledge of the disease state is available, but for whatever
 reason sequential inference is not possible.  In the situation
@@ -457,12 +518,19 @@ state--dependent sequence of target fractions, but does not involve the
 additional computational burden associated with stochastic dynamic
 programming.
 
+As in many decision problems, it can be difficult to specify cost
+functions that truly represent all aspects of the actions.  Although
+\pkg{amei} is based on a very simple cost evaluation scheme, it is
+straightforward to extend our approach to more complex cost functions,
+including state-dependent costs.  We refer the reader to \cite{merl09} for
+more detailed discussion of more complex cost assignments.  
+
 If there is not much data observed during an epidemic (for instance if
 the epidemic is occurring in a small population) then estimating
 disease parameters within any framework could, of course, be
 difficult. One could use data about previous epidemics to estimate
 parameters, for instance by maximum likelihood methods, to plan an
-intervention. However, as we showed in Section \ref{sec:pnas}, should
+intervention. However, as we showed in Section~\ref{sec:pnas}, should
 these estimates be poor then the cost of intervening in the epidemic can
 be greatly increased. By instead using previous epidemic data to
 inform the priors within a Bayesian framework, such as the one we
@@ -470,30 +538,30 @@ describe here, we can take into account other research and
 observations without risking the high costs inherent in using
 incorrect parameter estimates for planning an intervention.
 
-Recently other authors (e.g., \cite{elderd06}) have also proposed
+Recently other authors \citep[e.g.,][]{elderd06} have also proposed
 using Bayesian methods to estimate disease parameters and propagate
 uncertainty in parameter estimates through to an optimal of
-vaccination strategy. For instance, Elderd, et al.~\cite{elderd06},
+vaccination strategy. For instance, \citet{elderd06},
 considered a Susceptible--Exposed--Infectious--Recovered (SEIR) model
 for a small pox epidemic with mass action infection dynamics, and
 either mass or trace vaccination. However, in their approach
 the likelihood requires numerical solutions of the system of DEs (which
 can be computationally intensive).
 %, and imposes a tenuous normality assumption.
-Ball, et al.~\cite{ball02,ball07} have also written technical papers
+\citet{ball02,ball07} have also written technical papers
 on the optimal vaccination strategies in epidemics, but do not
 consider adapting the policy over time. %{\bf Need to check this.}
 
 Compared to these approaches, our proposed method has several
-advantages.  Our negative binomial discreetization of the SIR model is
+advantages.  Our negative binomial discretization of the SIR model is
 much less computationally intensive, and could easily be expanded to
-include an exposed class. Additionally, this model is comparitively
+include an exposed class. Additionally, this model is comparatively
 simple since it connects intuitively with a straightforward SIR model,
 and is thus likely to be much more approachable to policy makers and
-practicioners outside of of statistics. Our approach is also adaptive,
+practitioners outside of statistics. Our approach is also adaptive,
 allows a much more flexible cost framework, and is generalizable to
 other types of interventions.  Since the intervention strategy
-implemented by {\tt amei} is iteratively updated upon the arrival of
+implemented by \pkg{amei} is iteratively updated upon the arrival of
 new data, the vaccination schedule is inherently adaptive to the state
 of the epidemic.  This allows significant changes in the vaccination
 strategy mid-intervention.  This may be helpful, for example, in a
@@ -502,72 +570,91 @@ subsequent refinement of parameter estimates or a surge of new
 infections may dictate that the vaccination campaign should be
 re-initiated.
 
-Not only can more comlicated infection dynamics be used for simulating
+Not only can more complicated infection dynamics be used for simulating
 the dynamics of a disease, but in addition the method implemented in
-{\tt amei} can be modified to include more complicated disease
+\pkg{amei} can be modified to include more complicated disease
 dynamics such as latent states or vector-communicated diseases, as
 well as more complicated intervention strategies that allow
 combinations of vaccination, quarantine, and culling.  Also note the
-possibility of calculating policies based on minimization of some
+possibility of calculating policies based on a minimization of some
 quantile of the realized cost rather than the mean cost.  This would
-lead to minimization of worst-case-scenarios, which may be useful in
+lead to a minimization of worst-case-scenarios, which may be useful in
 practice.
 
-There are other {\sf R} packages that involve the simulation of
+There are other \proglang{R} packages that involve the simulation of
 epidemics, and inference for models like SIR.  As far as we can tell,
 ours is the only one which considers (on--line) adaptive management of
 interventions.  However, two packages that take approaches similar to
 ours for inferring the parameters governing an epidemic are worth
-mentioning here.  {\tt stochasticGEM} \cite{stochasticGEM:R} provides
+mentioning here.  \pkg{stochasticGEM} \citep{stochasticGEM:R} provides
 Bayesian inference for partially observed stochastic epidemics.  The
 implementation in this package also allows for estimating parameters
 governing the infectious and incubation period length.  Several
-variants of the general epidemic model are considered (e.g.,
-\cite{gibson98,hohle05,oneill99,oneill01,oneill02,streftaris04}),
+variants of the general epidemic model are considered
+\citep[e.g.,][]{gibson98,hohle05,oneill99,oneill01,oneill02,streftaris04},
 including the stochastic SIR with Markovian and non--Markovian
-infectious periods, and SEIR models. As with {\tt amei}, estimation is
-via MCMC.  H\"ohle, et al., whose methods are implemented in the {\tt
-  stochasticGEM} package, have themselves released an {\sf R} package
-called {\tt RLadyBug} \cite{RLadyBug:R}. In this package, maximum
-likelihood and Bayesian inference can be performed to estimate the
-parameters and provide confidence/credible intervals and the ability
-to test hypotheses.  Unfortunately, the package requires {\sf JAVA}.
-However, they do provide a nice paper outlining the usage
-\cite{hohle07} with examples.  Both packages contain interesting data
-sets on epidemics and visualization tools.
+infectious periods, and SEIR models. As with \pkg{amei}, estimation is
+via MCMC.  H\"ohle, et al., whose methods are implemented in the
+\pkg{stochasticGEM} package, have themselves released an \proglang{R}
+package called \pkg{RLadyBug} \citep{RLadyBug:R}, which requires {\sf
+  JAVA}. In \pkg{RLadyBug} maximimum likelihood and Bayesian inference
+can be performed to estimate the parameters and provide
+confidence/credible intervals and the ability to test hypotheses. The
+package can also estimate parameters for epidemics which include
+population heterogeneity. The authors of \pkg{RLadyBug} provide a nice
+paper outlining the usage \citep{hohle07} with examples.  Both
+\pkg{RLadyBug} and \pkg{stochasticGEM} contain interesting data sets
+on epidemics and visualization tools.
 
-There are several other {\sf R} packages that allow for the
+There are several other \proglang{R} packages that allow for the
 manipulation and analysis of epidemic and disease data.  They include
 a few packages which are predominantly used for teaching purposes,
-e.g.: {\tt Epi} \cite{Epi:R} with methods for multiscale and censored
-data; {\tt epiR} \cite{epiR:R} focusing on veterinary epidemiology,
-and {\tt epibasix} \cite{epibasix:R}.  Two other packages that include
+e.g.: \pkg{Epi} \citep{Epi:R} with methods for multiscale and censored
+data; \pkg{epiR} \citep{epiR:R} focusing on veterinary epidemiology,
+and \pkg{epibasix} \citep{epibasix:R}.  Two other packages that include
 a range of statistical functionality for data manipulation and
-inference are {\tt epicalc}\cite{epicalc:R} and {\tt epitools}
-\cite{epitools:R}.
-
-\subsection*{Acknowledgments}
-This work was partially supported by NSF grant DMS 0310542 to MM, and
-EPSRC grant \#EP/D065704/1 to RBG.
+inference are \pkg{epicalc}\citep{epicalc:R} and \pkg{epitools}
+\citep{epitools:R}.
 
 \appendix
 
 \section{Implementation details}
 
-At a high level, most of the functions and routines in the {\tt amei}
-package are written in {\sf R}.  However, most the sub--routines
+At a high level, most of the functions and routines in the \pkg{amei}
+package are written in \proglang{R}.  However, most of the sub--routines
 implementing the Monte Carlo evaluation of costs for the various
 vaccination strategies, which are obtained by repeatedly simulating
 the epidemic forward in time given the current samples of the
-parameter estimates, are written in {\sf C} for speed considerations.
-There is significant scope for parallelizations of these Monte Carlo
-routines, since each forward simulation is independent of the next.
-For this reason future versions of this package may leverage {\tt
-  Pthreads} or {\tt MPI} to obtain significant speedups.
+parameter estimates, are written in \proglang{C} for speed
+considerations.  There is significant scope for parallelizations of
+these Monte Carlo routines, since each forward simulation is
+independent of the next.  For this reason future versions of this
+package may leverage \pkg{Pthreads} or \pkg{MPI} to obtain significant
+speedups.
+
+This document has been authored in \pkg{Sweave} (try
+\code{help(Sweave)}).  This means that the code quoted throughout is
+certified by \proglang{R}, and the \code{Stangle} command can be used
+to extract it.  The demo available in this package will run the same
+code via \verb!demo("amei")!.
+
+% Note that this tutorial was not meant to serve as an instruction
+% manual.  For more detailed documentation of the functions contained in
+% the package, see the package help--manuals. At an \proglang{R} prompt, type
+% \code{help(package=amei)}. PDF documentation is also available on the
+% world-wide-web.
+% \begin{center}
+% \tt http://www.cran.r-project.org/web/packages/amei/index.html
+% \end{center}
+
+\subsection*{Acknowledgments}
+This work was partially supported by NSF grant DMS 0310542 to MM, and
+EPSRC grant \#EP/D065704/1 to RBG.  We thank two referees and 
+an editor for thoughtful comments that lead to an improved paper.
 
 %{\bf Can we think of anything else to put here? }
 
 \bibliography{amei}
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
 
 \end{document}

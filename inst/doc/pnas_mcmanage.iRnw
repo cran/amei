@@ -5,24 +5,24 @@
 Next, we illustrate a Monte Carlo experiment where epidemics are
 initialized and proceed randomly through the adaptive management
 strategy illustrated above so that we can see the average behavior,
-costs, and associated variability.  The function {\tt MCmanage}
-facilitates this experiment, and it essentially calls the {\tt
-  manage} function many times (which can be controlled by the {\tt
-  MCreps} argument).  In order to provide a (relatively) quick
-demonstration we have set a low default of {\tt MCreps = 30} and have
-used low defaults for the other Monte Carlo parameters to {\tt
-  management}.
+costs, and associated variability.  The function \code{MCmanage}
+facilitates this experiment, and it essentially calls the 
+\code{manage} function many times (which can be controlled by the 
+\code{MCreps} argument).  In order to provide a (relatively) quick
+demonstration we have set a low default of \code{MCreps = 30} and have
+used low defaults for the other Monte Carlo parameters to 
+\code{management}.
 
 <<cache=TRUE>>=
 out.MCmanage <- MCmanage(init, epistep, vacgrid, costs)
 @ 
-To reproduce the results in Merl, et al.~\cite{merl08}, use 
+To reproduce the results in \citet{merl09}, use 
 \begin{verbatim}
 MCvits = 100, MCMCpits = 10000, vacsamps = 100, MCreps = 100
 \end{verbatim}
 and otherwise use the defaults.  The object that is returned is of
 class \verb!"MCepi"! with fields similar to those that are output from
-the {\tt MCepi} function which implements a static (fixed) vaccination 
+the \code{MCepi} function which implements a static (fixed) vaccination 
 strategy.  Thus, the same generic plot commands can be used.
 \begin{figure}[ht!]
 <<label=MCmanepis,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
@@ -34,13 +34,13 @@ plot(out.MCmanage)
 plot(out.MCmanage, type="costs")
 @
 \includegraphics{amei-MCmancosts}
-\caption{Monte Carlo simulated epidemic trajectories (top) for the
+\caption{Monte Carlo simulated epidemic trajectories ({\em top}) for the
   numbers of susceptible, infected, and vaccinated individuals, and
-  the associated cost(s) (bottom) under adaptive management}
+  the associated cost(s) ({\em bottom}) under adaptive management}
 \label{f:epismanage}
 \end{figure}
-Figure \ref{f:epismanage} shows plots summarizing the distribution of
-epidemic trajectories (top) and costs (bottom) under the adaptive
+Figure~\ref{f:epismanage} shows plots summarizing the distribution of
+epidemic trajectories ({\em top}) and costs ({\em bottom}) under the adaptive
 management.  Distributional information on number of vaccine units
 dispensed can be extracted as follows.
 <<cache=TRUE>>=
@@ -56,13 +56,13 @@ plot(out.MCmanage, type="fracs")
 plot(out.MCmanage, type="stops")
 @
 \includegraphics{amei-MCmanstops}
-\caption{Fractions vaccinated (top) and stopping levels (bottom) for  
-  the simulated epidemic trajectories shown in Figure \ref{f:epismanage}
+\caption{Fractions vaccinated ({\em top}) and stopping levels ({\em bottom}) for  
+  the simulated epidemic trajectories shown in Figure~\ref{f:epismanage}
   that were under adaptive management.  In both cases, the $(2.5,50,97.5)$-\%
   quantiles are shown.}
 \label{f:MCfracs}
 \end{figure}
-Figure \ref{f:MCfracs} shows the distribution of fractions of
+Figure~\ref{f:MCfracs} shows the distribution of fractions of
 individuals vaccinated and the stopping level for the epidemic
 trajectories under adaptive management in the Monte Carlo experiment.
 We can compare the costs (and quantile bounds) to that of the best
@@ -76,8 +76,8 @@ data.frame(rbind(cinit, copt, cman),
            row.names=c("init", "opt", "man"))
 @ 
 The cost of the non-intervention strategy is shown again for
-calibration purposes.  As before, the generic {\tt print} and {\tt
-  summary} commands can be used to obtain the same information.
+calibration purposes.  As before, the generic \code{print} and 
+\code{summary} commands can be used to obtain the same information.
 Notice that, in this short Monte Carlo experiment, the adaptive
 management scheme approximates the best static vaccination scheme
 obtained then the true parameterization is known in advance.  

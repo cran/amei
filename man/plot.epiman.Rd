@@ -11,9 +11,10 @@
 }
 \usage{
 \method{plot}{epiman}(x, type = c("epi", "costs", "params", "fracs", 
-         "stops"), showd = FALSE, main = NULL, true = NULL, ...)
+         "stops"), showd = FALSE, showv = FALSE, prior = FALSE,
+         main = NULL, ylim = NULL, true = NULL, ...)
 \method{plot}{MCepi}(x, type = c("epi", "costs", "fracs", "stops"), 
-          showd = FALSE, showv = FALSE, main = NULL, ...)
+          showd = FALSE, showv = FALSE, main = NULL, ylim = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,6 +30,8 @@
   \item{main}{ optional title argument for the plot.  If not specified,
     then an automatically generated default is used depending on the
     \code{type} of plot specified }
+  \item{ylim}{ optional limit for the y axis of the plot, applies only
+  to \code{type="cost"}..}
   \item{true}{ this argument only applies to \code{plot.epiman} with
     \code{type = "params"} where it should be a \code{list} with scalar
     entries \code{$b}, \code{$k}, \code{$nu}, and \code{$mu} indicating
@@ -36,10 +39,11 @@
     added (for comparison) to the posterior density plots }
   \item{showd}{ logical indicating if deaths should be
     shown in the trajectory plots when \code{type = "epi"} }
-  \item{showv}{ this argument only applies to \code{plot.MCepi} with
-    \code{type = "epi"} where it should be a logical indicating if
-    vaccinations should be shown in the trajectory plot 
-}  \item{\dots}{ additional arguments passed to \code{\link{plot}} } 
+  \item{showv}{ indicates if
+    vaccinations should be shown in the trajectory plot }
+  \item{prior}{ indicates whether the prior density should be added
+    to the plots when \code{type = "params"}, otherwise ignored}
+  \item{\dots}{ additional arguments passed to \code{\link{plot}} } 
 }
 \details{
   The functions documented here support visualization

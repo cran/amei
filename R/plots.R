@@ -1,23 +1,25 @@
 `plot.epiman` <-
 function (x, type = c("epi", "costs", "params", "fracs", "stops"), 
-    showd = FALSE, main = NULL, true = NULL, ...) 
+    showd = FALSE, showv=FALSE, prior=FALSE, main = NULL, ylim=NULL, true = NULL, ...) 
 {
     type <- match.arg(type)
     if (type == "epi") {
         if (is.null(main)) 
             main <- "Evolution of Epidemic"
-        PlotEpi(x$soln, showd = showd, main = main)
+        PlotEpi(x$soln, showd = showd, showv=showv, main = main)
     }
     else if (type == "costs") {
       if(is.null(x$pols)) stop("no vaccination strategy used")
       if (is.null(main)) 
         main <- "Evolution of Costs"
-      PlotCosts(x$soln, main = main)
+      PlotCosts(x$soln, main = main,ylim=ylim)
     }
     else if (type == "params") {
       if (is.null(main)) 
         main <- "MCMC Inference"
-      PlotParams(x$samp, NULL, true)
+      if(prior) hyper <- x$hyper
+      else hyper <- NULL
+      PlotParams(x$samp, NULL, true, hyper)
     }
     else if (type == "fracs") {
       if(is.null(x$vachist)) stop("no vaccination strategy used")
@@ -42,22 +44,34 @@ function (x, type = c("epi", "costs", "params", "fracs", "stops"),
 `plot.optvac` <-
 function (x, main = NULL, ...) 
 {
-    if (is.null(main)) 
+  mylayout = matrix(1,4,5)
+  mylayout[,5] = 2
+  layo = layout(mylayout)
+  cmin = min(x$C)
+  cmax = max(x$C)
+  cmat = matrix(seq(cmin,cmax,length=100),1,100)
+  
+  if (is.null(main)) 
         main <- "Optimal vaccination policy surface"
     image(x$vacgrid$fracs, x$vacgrid$stops, x$C, main = main, 
-        xlab = "fraction", ylab = "stop number", ...)
+        xlab = "fraction", ylab = "stop number",col=heat.colors(100), ...)
     grid(length(x$vacgrid$fracs), length(x$vacgrid$stops), lty = 1, 
         col = "black")
     best <- getpolicy(x)
     worst <- getpolicy(x, "worst")
-    text(best$frac, best$stop, best$cost)
-    text(worst$frac, worst$stop, worst$cost)
+  text(best$frac, best$stop, best$cost,cex=1)
+  text(worst$frac, worst$stop, worst$cost,cex=1)
+
+  image(1,seq(cmin,cmax,length=100),cmat,axes=FALSE,xlab='',ylab='',main='',col=heat.colors(100))
+  axis(2,at=floor(seq(cmin,cmax,length=10)),lwd=0,las=1)
+  mtext('legend',line=1)
+  
 }
 
 
 `plot.MCepi` <-
 function (x, type = c("epi", "costs", "fracs", "stops"), showd = FALSE, 
-    showv = FALSE, main = NULL, ...) 
+    showv = FALSE, main = NULL, ylim = NULL, ...) 
 {
   type <- match.arg(type)
   if (type == "epi") {
@@ -69,7 +83,8 @@ function (x, type = c("epi", "costs", "fracs", "stops"), showd = FALSE,
   }
   else if (type == "costs") {
     if (is.null(main)) main <- "Monte Carlo Costs"
-    PlotCosts(x$Median, ylim = c(min(x$Q1$C), max(x$Q3$C)), 
+    if(is.null(ylim)) ylim <- c(min(x$Q1$C),max(x$Q3$C))
+    PlotCosts(x$Median, ylim = ylim,
               main = main, ...)
     PlotCosts(x$Q1, add = TRUE)
     PlotCosts(x$Q3, add = TRUE)

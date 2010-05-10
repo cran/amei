@@ -7,8 +7,6 @@
 #define TRUE 1
 #define FALSE 0
 
-/* my stuff */
-
 int ivequal(int* v1, int* v2, int n)
 {
   int k;
@@ -53,8 +51,6 @@ void insertSubMatrix(double** Asub, int dim, int* ind, double** A)
     for(j=0;j<dim;j++)
       A[ind[i]][ind[j]] = Asub[i][j];
 }
-
-
 
 float** new_2dfarray(int d1, int d2)
 {
@@ -457,11 +453,6 @@ void swap_3ddarray(double*** a, double*** b, int d1, int d2, int d3)
   return;
 }
 
-
-
-
-/* bobby's stuff is below here */
-
 /*
  * replace matrix with zeros
  */
@@ -492,10 +483,10 @@ void id(double **M, unsigned int n)
 
 double ** new_id_matrix(unsigned int n)
 {
-	unsigned int i;
-	double** m = new_zero_matrix(n, n);
-	for(i=0; i<n; i++) m[i][i] = 1.0;
-	return m;
+  unsigned int i;
+  double** m = new_zero_matrix(n, n);
+  for(i=0; i<n; i++) m[i][i] = 1.0;
+  return m;
 }
 
 
@@ -505,10 +496,10 @@ double ** new_id_matrix(unsigned int n)
 
 double ** new_zero_matrix(unsigned int n1, unsigned int n2)
 {
-	unsigned int i, j;
-	double **m = new_matrix(n1, n2);
-	for(i=0; i<n1; i++) for(j=0; j<n2; j++) m[i][j] = 0.0;
-	return m;
+  unsigned int i, j;
+  double **m = new_matrix(n1, n2);
+  for(i=0; i<n1; i++) for(j=0; j<n2; j++) m[i][j] = 0.0;
+  return m;
 }
 
 
@@ -516,22 +507,21 @@ double ** new_zero_matrix(unsigned int n1, unsigned int n2)
  * create a new n1 x n2 matrix which is allocated like
  * and n1*n2 array, but can be alloced with [][]
  */
-
 double ** new_matrix(unsigned int n1, unsigned int n2)
 {
-	int i;
-	double **m;
-
-	if(n1 == 0 || n2 == 0) return NULL;
-
-	m = (double**) malloc(sizeof(double*) * n1);
-	assert(m);
-	m[0] = (double*) malloc(sizeof(double) * (n1*n2));
-	assert(m[0]);
-
-	for(i=1; i<n1; i++) m[i] = m[i-1] + n2;
-
-	return m;
+  int i;
+  double **m;
+  
+  if(n1 == 0 || n2 == 0) return NULL;
+  
+  m = (double**) malloc(sizeof(double*) * n1);
+  assert(m);
+  m[0] = (double*) malloc(sizeof(double) * (n1*n2));
+  assert(m[0]);
+  
+  for(i=1; i<n1; i++) m[i] = m[i-1] + n2;
+  
+  return m;
 }
 
 
@@ -542,16 +532,16 @@ double ** new_matrix(unsigned int n1, unsigned int n2)
 
 double ** new_dup_matrix(double** M, unsigned int n1, unsigned int n2)
 {
-	double **m;
-
-	if(n1 <= 0 || n2 <= 0) {
-		assert(M == NULL);
-		return NULL;
-	}
-
-	m = new_matrix(n1, n2);
-	dup_matrix(m, M, n1, n2);
-	return m;
+  double **m;
+  
+  if(n1 <= 0 || n2 <= 0) {
+    assert(M == NULL);
+    return NULL;
+  }
+  
+  m = new_matrix(n1, n2);
+  dup_matrix(m, M, n1, n2);
+  return m;
 }
 
 
@@ -561,9 +551,9 @@ double ** new_dup_matrix(double** M, unsigned int n1, unsigned int n2)
 
 void dup_matrix(double** M1, double **M2, unsigned int n1, unsigned int n2)
 {
-	assert(M1 && M2);
-	unsigned int i, j;
-	for(i=0; i<n1; i++) for(j=0; j<n2; j++) M1[i][j] = M2[i][j];
+  assert(M1 && M2);
+  unsigned int i, j;
+  for(i=0; i<n1; i++) for(j=0; j<n2; j++) M1[i][j] = M2[i][j];
 }
 
 
@@ -574,103 +564,83 @@ void dup_matrix(double** M1, double **M2, unsigned int n1, unsigned int n2)
 
 void swap_matrix(double **M1, double **M2, unsigned int n1, unsigned int n2)
 {
-	unsigned int  i;
-	double *temp;
-	temp = M1[0];
-	M1[0] = M2[0];
-	M2[0] = temp;
-	for(i=1; i<n1; i++) {
-		M1[i] = M1[i-1] + n2;
-		M2[i] = M2[i-1] + n2;
-	}
+  unsigned int  i;
+  double *temp;
+  temp = M1[0];
+  M1[0] = M2[0];
+  M2[0] = temp;
+  for(i=1; i<n1; i++) {
+    M1[i] = M1[i-1] + n2;
+    M2[i] = M2[i-1] + n2;
+  }
 }
-
-
 
 /*
  * delete a matrix allocated as above
  */
-
 void delete_matrix(double** m)
 {
-	assert(*m);
-	free(*m);
-	assert(m);
-	free(m);
+  assert(*m);
+  free(*m);
+  assert(m);
+  free(m);
 }
-
 
 /*
  * print an n x col matrix allocated as above out an opened outfile.
  * actually, this routine can print any double** 
  */
-
 void printMatrix(double **M, unsigned int n, unsigned int col, FILE *outfile)
 {
   int i,j;
-
-  //  fprintf(outfile,"c(");
-
+  
   for(i=0; i<n; i++) {
     for(j=0; j<col; j++) {
-      //#ifdef DEBUG
-      //if(j==col-1) fprintf(outfile, "%.20f\n", M[i][j]);
-      //else fprintf(outfile, "%.20f ", M[i][j]);
-      //#else
-      //      if(i==n-1 && j==col-1) fprintf(outfile,"%.6f)\n",M[i][j]);      
       if(j==col-1) fprintf(outfile, "%.6f\n", M[i][j]);
       else fprintf(outfile, "%.6f ", M[i][j]);
-      //#endif
     }
   }
 }
-
-
-
 
 /*
  * allocate and return an array of length n with scale*1 at
  * each entry
  */
-
 double* ones(unsigned int n, double scale)
 {
-	double *o;
-	unsigned int i;
-	o = (double*) malloc(sizeof(double) * n);
-	assert(o);
-	for(i=0; i<n; i++) o[i] = scale;
-	return o;
+  double *o;
+  unsigned int i;
+  o = (double*) malloc(sizeof(double) * n);
+  assert(o);
+  for(i=0; i<n; i++) o[i] = scale;
+  return o;
 }
-
 
 /*
  * allocate and return an array containing
  * the seqence of doubles [from...to] with steps of
  * size by
  */
-
 double* dseq(double from, double to, double by)
 {
-	unsigned int n,i;
-	double *s = NULL;
-
-	by = abs(by);
-
-	if(from <= to) n = (unsigned int) (to - from)/abs(by) + 1;
-	else n = (unsigned int) (from - to)/abs(by) + 1;
-
-	if( n == 0 ) return NULL;
-
-	s = (double*) malloc(sizeof(double) * n);
-	assert(s);
-	s[0] = from;
-	for(i=1; i<n; i++) {
-		s[i] = s[i-1] + by;
-	}
-	return s;
+  unsigned int n,i;
+  double *s = NULL;
+  
+  by = abs(by);
+  
+  if(from <= to) n = (unsigned int) (to - from)/abs(by) + 1;
+  else n = (unsigned int) (from - to)/abs(by) + 1;
+  
+  if( n == 0 ) return NULL;
+  
+  s = (double*) malloc(sizeof(double) * n);
+  assert(s);
+  s[0] = from;
+  for(i=1; i<n; i++) {
+    s[i] = s[i-1] + by;
+  }
+  return s;
 }
-
 
 /*
  * allocate and return an array containing
@@ -679,42 +649,39 @@ double* dseq(double from, double to, double by)
 
 int* iseq(double from, double to)
 {
-	unsigned int n,i;
-	int by;
-	int *s = NULL;
-
-	if(from <= to) {
-		n = (unsigned int) (to - from) + 1;
-		by = 1;
-	} else {
-		assert(from > to);
-		n = (unsigned int) (from - to) + 1;
-		by = -1;
-	}
-
-	if(n == 0) return NULL;
-
-	s = (int*) malloc(sizeof(int) * n);
-	assert(s);
-	s[0] = from;
-	for(i=1; i<n; i++) {
-		s[i] = s[i-1] + by;
-	}
-	return s;
+  unsigned int n,i;
+  int by;
+  int *s = NULL;
+  
+  if(from <= to) {
+    n = (unsigned int) (to - from) + 1;
+    by = 1;
+  } else {
+    assert(from > to);
+    n = (unsigned int) (from - to) + 1;
+    by = -1;
+  }
+  
+  if(n == 0) return NULL;
+  
+  s = (int*) malloc(sizeof(int) * n);
+  assert(s);
+  s[0] = from;
+  for(i=1; i<n; i++) {
+    s[i] = s[i-1] + by;
+  }
+  return s;
 }
-
-
 
 /*
  * allocates a new double array of size n1
  */
-
 double* new_vector(unsigned int n)
 {
-	double *v;
-	if(n == 0) return NULL;
-	v = (double*) malloc(sizeof(double) * n);
-	return v;
+  double *v;
+  if(n == 0) return NULL;
+  v = (double*) malloc(sizeof(double) * n);
+  return v;
 }
 
 int* new_ivector(int n)
@@ -737,27 +704,24 @@ int* new_zero_ivector(int n)
  * allocates a new double array of size n1
  * and fills it with zeros
  */
-
 double* new_zero_vector(unsigned int n)
 {
-	double *v;
-	v = new_vector(n);
-	zerov(v, n);
-	return v;
+  double *v;
+  v = new_vector(n);
+  zerov(v, n);
+  return v;
 }
-
 
 /*
  * allocates a new double array of size n1
  * and fills it with the contents of vold
  */
-
 double* new_dup_vector(double* vold, unsigned int n)
 {
-	double *v;
-	v = new_vector(n);
-	dupv(v, vold, n);
-	return v;
+  double *v;
+  v = new_vector(n);
+  dupv(v, vold, n);
+  return v;
 }
 
 void dupiv(int* v, int* vold, int n)
@@ -771,48 +735,40 @@ void dupiv(int* v, int* vold, int n)
  * copies vold to v 
  * (assumes v has already been allcocated)
  */
-
 void dupv(double *v, double* vold, unsigned int n)
 {
-	unsigned int i;
-	for(i=0; i<n; i++) v[i] = vold[i];
+  unsigned int i;
+  for(i=0; i<n; i++) v[i] = vold[i];
 }
-
 
 /*
  * swaps the pointer of v2 to v1, and vice-versa
  * (aviods copying via dupv)
  */
-
 void swap_vector(double **v1, double **v2)
 {
-	double *temp;
-	temp = *v1;
-	*v1 = *v2;
-	*v2 = temp;
+  double *temp;
+  temp = *v1;
+  *v1 = *v2;
+  *v2 = temp;
 }
-
 
 /*
  * zeros out v
  * (assumes that it has already been allocated)
  */
-
 void zerov(double*v, unsigned int n)
 {
-	unsigned int i;
-	for(i=0; i<n; i++) v[i] = 0;
+  unsigned int i;
+  for(i=0; i<n; i++) v[i] = 0;
 }
-
 
 /*
  * printing a vector out to outfile
  */
-
 void printVector(double *v, unsigned int n, FILE *outfile)
 {
   unsigned int i;
-  //  fprintf(outfile,"c(");
   for(i=0; i<n-1; i++) fprintf(outfile, "%.6f ", v[i]);
   fprintf(outfile, "%.6f\n",v[i]);
 }
@@ -856,7 +812,6 @@ void printMatrixR(double** M, int d1, int d2, FILE *outfile)
  * pass back the index of the minimum through 
  * the which pointer
  */
-
 double min(double *v, unsigned int n, unsigned int *which)
 {
   unsigned int i;
@@ -879,7 +834,6 @@ double min(double *v, unsigned int n, unsigned int *which)
  * pass back the index of the maximum through 
  * the which pointer
  */
-
 double max(double *v, unsigned int n, unsigned int *which)
 {
   unsigned int i;
@@ -897,5 +851,3 @@ double max(double *v, unsigned int n, unsigned int *which)
   
   return max;
 }
-
-
