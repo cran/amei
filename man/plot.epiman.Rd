@@ -12,7 +12,7 @@
 \usage{
 \method{plot}{epiman}(x, type = c("epi", "costs", "params", "fracs", 
          "stops"), showd = FALSE, showv = FALSE, prior = FALSE,
-         main = NULL, ylim = NULL, true = NULL, ...)
+         main = NULL, ylim = NULL, tp = NULL, ...)
 \method{plot}{MCepi}(x, type = c("epi", "costs", "fracs", "stops"), 
           showd = FALSE, showv = FALSE, main = NULL, ylim = NULL, ...)
 }
@@ -32,7 +32,7 @@
     \code{type} of plot specified }
   \item{ylim}{ optional limit for the y axis of the plot, applies only
   to \code{type="cost"}..}
-  \item{true}{ this argument only applies to \code{plot.epiman} with
+  \item{tp}{ this argument only applies to \code{plot.epiman} with
     \code{type = "params"} where it should be a \code{list} with scalar
     entries \code{$b}, \code{$k}, \code{$nu}, and \code{$mu} indicating
     the true parameter entries for the evolution of the epidemic to be

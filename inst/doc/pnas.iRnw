@@ -1,9 +1,9 @@
 For reproducibility of the results in this section we have set
 the random seed as follows.
 <<cache=TRUE>>=
-seed <- 12345
-set.seed(seed)
+set.seed(12345)
 @ 
+The following sections tacitly use similarly reset seeds.
 
 We begin by exploring the behavior of the SIR model, described in
 Section~\ref{sec:sirmodel}, without any intervention. The first step
@@ -13,13 +13,13 @@ for the SIR model upon which our costs will be evaluated; the initial
 condition of the population at the beginning of the epidemic; and the
 relative costs of infections, deaths, and vaccinations.
 <<>>= 
-true <- list(b=0.00218, k=10, nu=0.4, mu=0) 
+tp <- list(b=0.00218, k=10, nu=0.4, mu=0) 
 init <- list(S0=762, I0=1, R0=0, D0=0) 
 costs <- list(vac=2, death=4, infect=1)
 @ 
 \citet{murray02} provides estimates of the transmission rate
 ($b$) and recovery rate ($\nu$), which we use in the 
-\code{true} parameterization set above.  We set the death rate
+\code{tp} ``true parameterization'' set above.  We set the death rate
 ($\mu$) to zero since there are no deaths in this epidemic.  Finally,
 we set the negative binomial dispersion parameter ($k$) 
 to be large to reflect the
@@ -47,7 +47,7 @@ times\footnote{The number of MC simulations can be varied with the
 populations and the costs, as well as the 5th and 95th quantiles, are
 recorded.
 <<cache=TRUE>>=
-init.MCepi <- MCepi(init, true, vac, costs)
+init.MCepi <- MCepi(init, tp, vac, costs)
 @ 
 
 Now we can simply plot the results to look at the distribution of the
@@ -90,7 +90,7 @@ the (stochastic) epidemic.  This is done by simulating the epidemic
 forward under the known, \code{true}, parameterization and calculating
 the cost of each vaccination strategy.  
 <<cache=TRUE>>= 
-out.optvac <-optvac(init, true, vacgrid, costs) 
+out.optvac <-optvac(init, tp, vacgrid, costs) 
 @
 This function outputs the costs
 for each of the possible vaccination strategies. The best and worst
@@ -130,7 +130,7 @@ however this time we include the best fixed vaccination policy.
 
 <<cache=TRUE>>=
 vac.opt <- best[3:4]
-opt.MCepi <- MCepi(init, true, vac.opt, costs)
+opt.MCepi <- MCepi(init, tp, vac.opt, costs)
 @
 \begin{figure}[ht!]
 <<label=episov,fig=TRUE,echo=TRUE,width=8,height=5,include=FALSE,cache=TRUE>>=
@@ -184,7 +184,7 @@ approximately \Sexpr{initC$mean-optC$mean} units, or
 \Sexpr{round(100*(1-optC$mean/initC$mean))}\% compared to the cost 
 without an intervention.  The same 
 information is available through the generic \code{print} and
-\code{summary} commands, e.g.,
+\code{summary} commands, e.g.\ 
 <<cache=TRUE>>=
 opt.MCepi
 @ 
@@ -206,7 +206,7 @@ assumed for inference, however the user can specify custom
 provide custom data to \pkg{amei}, or explore the effects of model
 misspecification, as we shall describe in Section~\ref{sec:alt}.
 
-We also need to start with an initial guess, {\em i.e.}, priors, for the
+We also need to start with an initial guess, i.e.\ priors, for the
 epidemic parameters that we want to estimate. The default option is to
 do this by choosing appropriate hyperparameters for the priors
 explained earlier.  The defaults used by \code{manage} are those
@@ -273,7 +273,7 @@ comparison.
 \begin{figure}[ht!]
 <<label=params,fig=TRUE,echo=TRUE,width=8,height=7,include=FALSE,cache=TRUE>>=
 true <- as.list(formals(epistep)$true)
-plot(out.man, type="params",true=true) 
+plot(out.man, type="params",tp=tp) 
 @ 
 \centering \includegraphics[trim=0 0 0 20]{amei-params}
 \caption{Final posterior distributions of estimated parameters 

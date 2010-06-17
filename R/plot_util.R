@@ -1,5 +1,5 @@
 ## Function for plotting the SIR curves.  Uses list object returned by SimulateEpidemic()
-PlotEpi = function(simoutput,add=FALSE,showd=TRUE,showv=TRUE, ...)
+PlotEpi <- function(simoutput,add=FALSE,showd=TRUE,showv=TRUE, ...)
   {
     mycols <- c(rgb(55/255,126/255,184/255),rgb(228/255,26/255,28/255),
                 rgb(77/255,175/255,74/255),rgb(152/255,78/255,163/255),rgb(255/255,127/255,0/255))
@@ -44,7 +44,7 @@ PlotEpi = function(simoutput,add=FALSE,showd=TRUE,showv=TRUE, ...)
   }
 
 ## function for plotting the cost trajectories associated with the epidemics
-PlotCosts = function(simoutput,add=FALSE, ylim=NULL, ...)
+PlotCosts <- function(simoutput,add=FALSE, ylim=NULL, ...)
   {
     if(add)
       {
@@ -65,8 +65,8 @@ PlotCosts = function(simoutput,add=FALSE, ylim=NULL, ...)
 ## true value on the plots. 
 PlotParams <-  function(samp, dens, true, hyper=NULL) 
   {
-    allnames2 = c(expression(b),expression(k),expression(nu),expression(mu))
-    allnames = c("b","k","nu","mu")
+    allnames2 <- c(expression(b),expression(k),expression(nu),expression(mu))
+    allnames <- c("b","k","nu","mu")
     par(mfrow=c(2,2))
     for(p in 1:4)
       {    
@@ -114,7 +114,7 @@ PlotParams <-  function(samp, dens, true, hyper=NULL)
   }
 
 ## takes a matrix in which each row is a new time point, and the columns are sampled values of some variable
-TimeSeriesOfDensities = function(X,times,xbounds,varname="",main="")
+TimeSeriesOfDensities <- function(X,times,xbounds,varname="",main="")
   {
     t <- nrow(X)
     n <- ncol(X)

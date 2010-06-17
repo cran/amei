@@ -1,6 +1,6 @@
 `plot.epiman` <-
 function (x, type = c("epi", "costs", "params", "fracs", "stops"), 
-    showd = FALSE, showv=FALSE, prior=FALSE, main = NULL, ylim=NULL, true = NULL, ...) 
+    showd = FALSE, showv=FALSE, prior=FALSE, main = NULL, ylim=NULL, tp = NULL, ...) 
 {
     type <- match.arg(type)
     if (type == "epi") {
@@ -19,7 +19,7 @@ function (x, type = c("epi", "costs", "params", "fracs", "stops"),
         main <- "MCMC Inference"
       if(prior) hyper <- x$hyper
       else hyper <- NULL
-      PlotParams(x$samp, NULL, true, hyper)
+      PlotParams(x$samp, NULL, tp, hyper)
     }
     else if (type == "fracs") {
       if(is.null(x$vachist)) stop("no vaccination strategy used")
@@ -44,12 +44,12 @@ function (x, type = c("epi", "costs", "params", "fracs", "stops"),
 `plot.optvac` <-
 function (x, main = NULL, ...) 
 {
-  mylayout = matrix(1,4,5)
-  mylayout[,5] = 2
-  layo = layout(mylayout)
-  cmin = min(x$C)
-  cmax = max(x$C)
-  cmat = matrix(seq(cmin,cmax,length=100),1,100)
+  mylayout <- matrix(1,4,5)
+  mylayout[,5] <- 2
+  layo <- layout(mylayout)
+  cmin <- min(x$C)
+  cmax <- max(x$C)
+  cmat <- matrix(seq(cmin,cmax,length=100),1,100)
   
   if (is.null(main)) 
         main <- "Optimal vaccination policy surface"

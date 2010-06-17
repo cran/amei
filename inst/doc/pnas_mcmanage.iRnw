@@ -1,6 +1,6 @@
-%<<echo=false,results=hide>>=
-%seed <- 12345; set.seed(seed)
-%@ 
+<<echo=false,results=hide>>=
+set.seed(12345)
+@ 
 
 Next, we illustrate a Monte Carlo experiment where epidemics are
 initialized and proceed randomly through the adaptive management
@@ -102,7 +102,7 @@ Then, we can calculate the distribution of costs of managing
 the true epidemic with a policy developed under our best guess
 of the parameterization.
 <<cache=TRUE>>=
-bad.MCepi <- MCepi(init, true, pol.bad[3:4], costs)
+bad.MCepi <- MCepi(init, tp, pol.bad[3:4], costs)
 cbad <- getcost(bad.MCepi)
 cbad
 @ 

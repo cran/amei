@@ -1,11 +1,10 @@
 \section{Alternative Transmission Model}
 \label{sec:alt}
 
-For reproducibility of the results in this section we have, again, set
-the random seed as follows.
-<<cache=FALSE>>=
-seed <- 12345
-set.seed(seed)
+%For reproducibility of the results in this section we have, again, set
+%the random seed as follows.
+<<cache=FALSE,echo=false,results=hide>>=
+set.seed(12345)
 @ 
 
 We would like to see how well the fixed and adaptive strategies can do
@@ -68,26 +67,26 @@ package methods as follows.
 <<keep.source=TRUE,cache=TRUE>>=
 alt.epistep <- 
 function(SIR, last=list(rem=0, rec=0, infect=0, dead=0, Z=0),
-         true=list(a = 0.05, mu = 0.05, nu = 0.1, m = 0.4, 
+         tp=list(a = 0.05, mu = 0.05, nu = 0.1, m = 0.4, 
 	 rho = 200, C = 500))
 {
   ## calculate the infection probability based on the
   ## reservoir, and randomly infect susceptibles
   Z <- last$Z
-  fz <- Z/(Z+true$C)
-  pi <- 1 - exp(-true$a * fz)
+  fz <- Z/(Z+tp$C)
+  pi <- 1 - exp(-tp$a * fz)
   infect <- rbinom(1, SIR$S, pi)
 
   ## update recovereds and deaths
-  pr <- 1 - exp(-true$nu)
+  pr <- 1 - exp(-tp$nu)
   rec <- rbinom(1,SIR$I,pr)
-  pd <- 1 - exp(-true$mu)
+  pd <- 1 - exp(-tp$mu)
   dead <- rbinom(1, SIR$I-rec, pd)
 
   ## reservoir dynamics
-  pz <- 1 - exp(-true$m)
+  pz <- 1 - exp(-tp$m)
   dz <- rbinom(1, Z, pz)
-  bz <- round(SIR$I*true$rho)
+  bz <- round(SIR$I*tp$rho)
   Z <- Z - dz + bz
 
   ## the returned list is passed in as "last" in a
@@ -108,9 +107,9 @@ is large, so infective agents do not remain in the reservoir for long.
 % old parameters: a=0.065, m=(0.99, 0.005)
 <<cache=TRUE>>=
 init1 <- list(S0=150, I0=1, R0=0, D0=0)
-true<- list(a=0.1, mu=0.0, nu=0.3, m=50, rho=500, C=500)
+tp <- list(a=0.1, mu=0.0, nu=0.3, m=50, rho=500, C=500)
 alt.epistep1 <- alt.epistep
-formals(alt.epistep1)$true <- true
+formals(alt.epistep1)$tp <- tp
 out.alt<- manage(init1, alt.epistep1, NULL, NULL, T=80)
 @ 
 The {\em top} of Figure~\ref{f:alt} shows the resulting dynamics
@@ -122,9 +121,9 @@ infections to occur even if there had been no infected individuals in
 a previous time step since the infective agent may persist in the
 reservoir for a long time without infected individuals being present.
 <<cache=TRUE>>=
-true <- list(a=0.1, mu=0.0, nu=0.3, m=0.001, rho=500, C=500)
+tp <- list(a=0.1, mu=0.0, nu=0.3, m=0.001, rho=500, C=500)
 alt.epistep2 <- alt.epistep
-formals(alt.epistep2)$true <- true
+formals(alt.epistep2)$tp <- tp
 out.alt2 <- manage(init1, alt.epistep2, NULL, NULL, T=80)
 @ 
 \begin{figure}[ht!]
@@ -197,7 +196,7 @@ default ``true'' parameters.
 % this one with the tricky cost structure give interesting cost
 % surface but isn't necessarily good for comparison
 % costs <- list(vac=3.25, death=25, infect=1) 
-% true<- list(a=0.035, mu=0.0075, nu=0.35, m=0.01, rho=1000, C=500) 
+% tp<- list(a=0.035, mu=0.0075, nu=0.35, m=0.01, rho=1000, C=500) 
 %
 %
 % the next is similar to above, but the adaptive one does quite a bit
@@ -208,9 +207,9 @@ default ``true'' parameters.
 % larger the reservoir, and this reservoir sticks around to keep
 % infecting individuals
 % costs <- list(vac=3.25, death=40, infect=1)
-% true<- list(a=0.08, mu=0.0075, nu=0.35, m=0.01, rho=20, C=5000)
-%true<- list(a=0.06, mu=0.01, nu=0.3, m=0.15, rho=1000)
-%formals(alt.epistep)$true <- true
+% tp<- list(a=0.08, mu=0.0075, nu=0.35, m=0.01, rho=20, C=5000)
+%tp<- list(a=0.06, mu=0.01, nu=0.3, m=0.15, rho=1000)
+%formals(alt.epistep)$tp <- tp
 %
 <<cache=TRUE>>=
 init <- list(S0=600, I0=1, R0=0, D0=0)
@@ -294,12 +293,12 @@ An alternative (and possibly fairer) approach would be to allow the
 adaptive strategy to cheat as well by choosing the prior to be tightly
 concentrated around around the \code{mean.params} estimated above.
 \begin{figure}[ht!]
-<<label=alt-MCepi-t,fig=TRUE,echo=TRUE,width=6,height=4,include=FALSE,cache=TRUE>>=
+<<label=alt-MCepi-t,fig=TRUE,echo=TRUE,width=6,height=4.5,include=FALSE,cache=TRUE>>=
 plot(alt.MCepi, showd=TRUE)
 @
 \centering
 \includegraphics[trim=0 20 0 20]{amei-alt-MCepi-t} 
-<<label=alt-MCepi-c,fig=TRUE,echo=TRUE,width=6,height=4,include=FALSE,cache=TRUE>>=
+<<label=alt-MCepi-c,fig=TRUE,echo=TRUE,width=6,height=4.5,include=FALSE,cache=TRUE>>=
 plot(alt.MCepi, type="costs")
 @
 \centering
@@ -311,12 +310,12 @@ parameterization under the optimal static vaccination policy.}
 \label{f:alt-MCepi}
 \end{figure} 
 \begin{figure}[ht!]
-<<label=alt-MCmanage-t,fig=TRUE,echo=TRUE,width=6,height=4,include=FALSE,cache=TRUE>>=
+<<label=alt-MCmanage-t,fig=TRUE,echo=TRUE,width=6,height=4.5,include=FALSE,cache=TRUE>>=
 plot(alt.MCmanage, showd=TRUE)
 @
 \centering
 \includegraphics[trim=0 20 0 20]{amei-alt-MCmanage-t} 
-<<label=alt-MCmanage-c,fig=TRUE,echo=TRUE,width=6,height=4,include=FALSE,cache=TRUE>>=
+<<label=alt-MCmanage-c,fig=TRUE,echo=TRUE,width=6,height=4.5,include=FALSE,cache=TRUE>>=
 plot(alt.MCmanage, type="costs")
 @
 \centering

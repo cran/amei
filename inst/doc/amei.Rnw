@@ -20,13 +20,13 @@
 
 <<echo=false,results=hide>>=
 library(amei)
-options(width=60)
+options(width=70, prompt="R> ", digits=5)
 @ 
 
 \title{\pkg{amei}: an \proglang{R} package for the Adaptive\\ 
   Management of Epidemiological Interventions}
 \author{Daniel Merl\\
-  Lawrence Livermore National Lab
+  University of California, Santa Cruz
  \And Leah R.~Johnson\\
  University of California, Santa Barbara
   \AND Robert B.~Gramacy\\
@@ -65,9 +65,9 @@ Monte Carlo}
 
 \Address{
 Daniel Merl\\
-Systems and Intelligence Analysis\\
-Lawrence Livermore National Laboratory\\
-Livermore, CA 94551\\
+Department of Applied Mathematics and Statistics\\
+University of California, Santa Cruz\\
+Santa Cruz, CA 95064\\
 USA\\
 E-mail: \email{merl1@llnl.gov}\\
 \\
@@ -89,8 +89,7 @@ E-mail: \email{bobby@statslab.cam.ac.uk}\\
 URL: \url{http://www.statslab.cam.ac.uk/~bobby}\\
 \\
 Marc Mangel\\
-Department Applied Mathematics and Statistics\\
-The Jack Baskin School of Engineering\\
+Department of Applied Mathematics and Statistics\\
 University of California, Santa Cruz\\
 Santa Cruz, CA 95064\\
 USA\\
@@ -152,37 +151,38 @@ adaptively depends on the state of the epidemic.
 
 Most existing methods for finding optimal intervention strategies are
 concerned with the situation of pre-emptive intervention which is
-assumed to be completed before the onset of the epidemic (for instance
-see \citet{ball02,patel05,tildesley06}).  In this kind of situation,
-there is no reason to consider sequentially updated (i.e. adaptive)
+assumed to be completed before the onset of the epidemic \citep[for instance
+see][]{ball02,patel05,tildesley06}.  In this kind of situation,
+there is no reason to consider sequentially updated (i.e.\ adaptive)
 interventions: as soon as the intervention policy is triggered, the
 epidemic threat will be eradicated.  However, in most scenarios, total
 and instantaneous intervention will not be an implementable strategy.
-Moreover, these methods usually involve calculations that assume no
-uncertainty in key model parameters, including transmission rate,
-recovery rate, and others (however, see \citet{elderd06}
-and our brief discussion in Section~\ref{sec:discuss}).
+Moreover, these methods usually evaluate the cost of the epidemic in a
+manner that assumes no uncertainty in key model parameters, including
+transmission rate, recovery rate, and others (however, see \citealt{elderd06} and our brief discussion in
+Section~\ref{sec:discuss}).
 
-Here we introduce \pkg{amei}, a software package that implements a
-statistical framework introduced by \citet{merl09}, that
-allows one to respond to an emerging epidemic while simultaneously
-learning about it.  We consider vaccination strategies defined by a
-fraction of the current susceptible population to be targeted for
-vaccination, and a threshold number of susceptibles below which the
-vaccination campaign is called off. We couple the evaluation of
-optimal, adaptive, intervention strategies with Bayesian procedures
-for performing on-line estimation of the parameters of the underlying
-epidemic model, thereby propagating parameter uncertainty through to
-policy decisions. We demonstrate the advantages of adaptive
-intervention via the functions provided by the package using
-simulations modeled after an influenza outbreak at a British boarding
-school described by \citet{murray02}. We compare the
-distribution of costs arising from epidemiological intervention under
-the adaptive policies to those arising from non-adaptive policies
-(i.e. policies not dependent on the state of the epidemic and/or not
-reflecting parameter uncertainty), and find that the adaptive policies
-result in low total costs, efficient use of available resources,
-and are robust to model misspecification.
+Here we introduce \pkg{amei}, an \proglang{R} package \citep{cranR} that
+implements the statistical framework introduced by \citet{merl09}.
+This framework allows one to respond to an emerging epidemic while
+simultaneously learning about its evolutionary dynamics.  We consider
+vaccination strategies defined by a fraction of the current
+susceptible population to be targeted for vaccination, and a threshold
+number of susceptibles below which the vaccination campaign is called
+off. We couple the evaluation of optimal, adaptive, intervention
+strategies with Bayesian procedures for performing on-line estimation
+of the parameters of the underlying epidemic model, thereby
+propagating parameter uncertainty through to policy decisions. We
+demonstrate the advantages of adaptive intervention via the functions
+provided by the package using simulations modeled after an influenza
+outbreak at a British boarding school described by
+\citet{murray02}. We compare the distribution of costs arising from
+epidemiological intervention under the adaptive policies to those
+arising from non-adaptive policies (i.e.\ policies not dependent on the
+state of the epidemic and/or not reflecting parameter uncertainty),
+and find that the adaptive policies result in low total costs,
+efficient use of available resources, and are robust to model
+misspecification.
 
 This tutorial is comprised of three main sections.  The mathematical
 specification of the Bayesian models used for inference and the Monte
@@ -225,12 +225,11 @@ numbers of deaths separately. We assume the population is closed to
 immigration or emigration so that $S(t)+I(t)+R(t)+D(t)=N$, where $N$
 is constant.
 
-Models of this type can include transmission dynamics ranging from the
-very simple to the very complex. We adopt a flexible negative binomial
-form for the transmission function
-\citep{godfray89,mangel06,mccallum01}. Under this assumption, the SIR
-model is described by the following system of differential equations
-\citep{hetchote00,mccallum01}:
+
+We adopt a flexible negative binomial form for the transmission
+function \citep{godfray89,mangel06,mccallum01}. Under this assumption,
+the SIR model is described by the following system of differential
+equations \citep{hetchote00,mccallum01}:
 \begin{align}
   \frac{\mathrm{d}S}{\mathrm{d}t} &=
 -kS \ln\left(1+\frac{bI}{k}\right) \label{dS} \\
@@ -244,7 +243,7 @@ overdispersion (or ``clumpiness'') parameter $k$; the death rate
 $\mu$; and the rate of recovery to the immune class $\nu$. The
 negative binomial distribution can be interpreted as a compound
 stochastic process in which encounters between infected and
-susceptible individuals occur randomly (i.e., according to a Poisson
+susceptible individuals occur randomly (i.e.\ according to a Poisson
 process) such that the encounter rate varies according to a gamma
 distribution with coefficient of variation $k^{-1/2}$.  Thus, via $k$,
 the negative binomial transmission can account for social interactions
@@ -261,23 +260,25 @@ interval gives
   S(t+1) = S(t) \left[ \frac{k}{k+bI(t)} \right]^k, \label{eq:meanS}
 \end{equation}
 so that the fraction of susceptible individuals surviving throughout a
-unit time interval is $\left[ \frac{k}{k+bI(t)}\right]^k$.  Viewed as
-a discrete time stochastic process, where the mean number of remaining
-susceptible individuals is given by Eq.~(\ref{eq:meanS}), the number
-of new infections occurring between time $t$ and $t+1$ when $S(t)=s$
-and $I(t)=i$ with mean
+unit time interval is $\left[ \frac{k}{k+bI(t)}\right]^k$.  When
+viewed as a discrete time stochastic process, where the mean number of
+remaining susceptible individuals is given by Eq.~(\ref{eq:meanS}),
+the mean number of new infections occurring between time $t$ and $t+1$ 
+is
 \[
-  S(t)\left(1 - \left[ \frac{k}{k+bI(t)} \right]^k\right)
+  S(t)\left(1 - \left[ \frac{k}{k+bI(t)} \right]^k\right).
 \]
-can be described as a binomial process
+Therefore, if $S(t)=s$ and $I(t)=i$, we may sensibly take the new
+infections $\tilde{I}$ at time $t+1$ to follow
 \begin{align}
-  \tilde{I}|s,i &\sim \mbox{Bin}(s, p_i(i,b,k)), \label{bini}
-  \intertext{where}
-  p_i(i,b,k) &= 1-\left(\frac{k}{k+bi}\right)^k \nonumber
+  \tilde{I}|s,i &\sim \mbox{Bin}(s, p_i(i,b,k)), \label{bini} &&
+  \mbox{where} &
+  p_i(i,b,k) &= 1-\left(\frac{k}{k+bi}\right)^k,
 \end{align}
-and Bin$(n,\pi)$ is the standard binomial distribution. Similarly, by
-integrating Eqs.~(\ref{dR}--\ref{dD}), the numbers of recoveries
-and deaths occurring between time $t$ and $t+1$ can be described by
+and Bin$(n,\pi)$ is the binomial distribution with size $n$ and
+success probability $\pi$. Similarly, by integrating
+Eqs.~(\ref{dR}--\ref{dD}), the numbers of recoveries and deaths
+occurring between time $t$ and $t+1$ can be described by
 \begin{eqnarray}
 \tilde{R}|i & \sim & \mbox{Bin}(i,p_r) \label{rtilde}\\
 \tilde{D}|i,\tilde{r} & \sim & \mbox{Bin}(i-\tilde{r},p_d) \label{dtilde}
@@ -306,9 +307,9 @@ A primary task of \pkg{amei} is to perform inference on the SIR model
 parameters, conditional on sequential observations of the numbers of
 susceptible, infected, and recovered individuals in the population.
 Given the discrete time approximation in the previous section, it is
-possible to do this online (i.e., as the epidemic progresses) via
+possible to do this online (i.e.\ as the epidemic progresses) via
 straightforward parametric Bayesian methods.  In particular, we use
-Markov Chain Monte Carlo (MCMC) \citep[e.g.,][]{gamerman06} to learn
+Markov Chain Monte Carlo (MCMC) \citep[e.g.\ ][]{gamerman06} to learn
 about the posterior distributions of $b$, $k$, $\nu$, and $\mu$
 conditioned on the evolution of the epidemic observed so far.  The
 likelihood is given recursively in
@@ -335,18 +336,18 @@ p(\nu) = (1-e^{-v})^{\alpha_r-1} e^{-v\beta_r}. \label{nup}
 \end{equation}
 Conjugate updating leads to the posterior conditional
 \begin{equation}
-p_r|\dots \sim \mbox{Beta}(\alpha_r + 
+p_r|\dots \sim \mbox{Beta}\left(\alpha_r + 
 \textstyle \sum_{t=1}^T \tilde{r}_t, 
-\beta_r + \sum_{t=1}^T I(t)- \tilde{r}_t). \label{prp}
+\beta_r + \sum_{t=1}^T I(t)- \tilde{r}_t\right). \label{prp}
 \end{equation}
 The form of the conditional posterior for $\nu$ is similar to
 Eq.~(\ref{nup}) and can be simulated by first drawing $p_r$ via
 Eq.~(\ref{prp}) and then applying the inverse transformation $\nu =
 -\log(1-p_d)$.  Sampling for $\mu$ proceeds similarly with
 \begin{equation}
-p_d|\dots \sim \mbox{Beta}(\alpha_d + 
+p_d|\dots \sim \mbox{Beta}\left(\alpha_d + 
 \textstyle \sum_{t=1}^T \tilde{d}_t, 
-\beta_d + \sum_{t=1}^T I(t) - \tilde{r}_t - \tilde{d}_t).
+\beta_d + \sum_{t=1}^T I(t) - \tilde{r}_t - \tilde{d}_t\right).
 \end{equation}
 Thus it is possible to take Gibbs samples for $\nu$ and $\mu$ so long
 as appropriate hyperparameters $\alpha_r, \beta_r, \alpha_d, \beta_d$
@@ -373,7 +374,7 @@ are $(\alpha_b, \beta_b) = (\alpha_k, \beta_k) = (1, 3)$ which (though
 seemingly informative at first glance) turns out to be uninformative
 on the scale of the support of the posterior.  As before, these can
 easily be changed by the user.  We use random walk uniform proposals
-on the positive real line, i.e., $b' \sim U[3b/4,4b/3]$, which gives
+on the positive real line, i.e.\ $b' \sim U[3b/4,4b/3]$, which gives
 reasonably good mixing in the Markov chain.
 
 The presence of a vaccination strategy (described in the next
@@ -451,7 +452,7 @@ intervention. Typically we discretize and create a grid of admissible
 $\alpha$ and $\gamma$ settings.  In the examples in
 Section~\ref{sec:pnas} we allow $\alpha$ to range from 0 to 1 in
 increments of $0.1$, and $\gamma$ to range from from 2 to $s_0-s_0/10$
-in increments of $s_0/10$, i.e., taking 10 steps.\footnote{We
+in increments of $s_0/10$, i.e.\ taking 10 steps.\footnote{We
   generally do not include $\gamma=s_0$ in the grid since this policy
   (coupled with any $\alpha$) is equivalent to $\alpha=0$ for any
   $\gamma$.}
@@ -538,7 +539,7 @@ describe here, we can take into account other research and
 observations without risking the high costs inherent in using
 incorrect parameter estimates for planning an intervention.
 
-Recently other authors \citep[e.g.,][]{elderd06} have also proposed
+Recently other authors \citep[e.g.\ ][]{elderd06} have also proposed
 using Bayesian methods to estimate disease parameters and propagate
 uncertainty in parameter estimates through to an optimal of
 vaccination strategy. For instance, \citet{elderd06},
@@ -591,7 +592,7 @@ Bayesian inference for partially observed stochastic epidemics.  The
 implementation in this package also allows for estimating parameters
 governing the infectious and incubation period length.  Several
 variants of the general epidemic model are considered
-\citep[e.g.,][]{gibson98,hohle05,oneill99,oneill01,oneill02,streftaris04},
+\citep[e.g.\ ][]{gibson98,hohle05,oneill99,oneill01,oneill02,streftaris04},
 including the stochastic SIR with Markovian and non--Markovian
 infectious periods, and SEIR models. As with \pkg{amei}, estimation is
 via MCMC.  H\"ohle, et al., whose methods are implemented in the
@@ -609,7 +610,7 @@ on epidemics and visualization tools.
 There are several other \proglang{R} packages that allow for the
 manipulation and analysis of epidemic and disease data.  They include
 a few packages which are predominantly used for teaching purposes,
-e.g.: \pkg{Epi} \citep{Epi:R} with methods for multiscale and censored
+e.g.\ : \pkg{Epi} \citep{Epi:R} with methods for multiscale and censored
 data; \pkg{epiR} \citep{epiR:R} focusing on veterinary epidemiology,
 and \pkg{epibasix} \citep{epibasix:R}.  Two other packages that include
 a range of statistical functionality for data manipulation and
@@ -632,11 +633,11 @@ independent of the next.  For this reason future versions of this
 package may leverage \pkg{Pthreads} or \pkg{MPI} to obtain significant
 speedups.
 
-This document has been authored in \pkg{Sweave} (try
-\code{help(Sweave)}).  This means that the code quoted throughout is
-certified by \proglang{R}, and the \code{Stangle} command can be used
-to extract it.  The demo available in this package will run the same
-code via \verb!demo("amei")!.
+This document has been authored in \pkg{Sweave} \citep{sweave}.  This
+means that the code quoted throughout is certified by \proglang{R},
+and the \code{Stangle} command can be used to extract it.  The demo
+available in this package will run the same code via
+\verb!demo("amei")!.
 
 % Note that this tutorial was not meant to serve as an instruction
 % manual.  For more detailed documentation of the functions contained in

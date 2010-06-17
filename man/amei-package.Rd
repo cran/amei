@@ -14,16 +14,6 @@
   anticipated trajectory of the epidemic given the current population
   state and updated parameter estimates.
 }
-\details{
-\tabular{ll}{
-Package: \tab amei\cr
-Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2008-10-20\cr
-License: \tab GPL\cr
-LazyLoad: \tab yes\cr
-}
-}
 \author{
 Daniel Merl <dan@stat.duke.edu>, 
 Leah R. Johnson <leah@statslab.cam.ac.uk>, 
