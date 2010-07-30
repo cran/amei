@@ -80,16 +80,20 @@ These quantities can be visually inspected using the
 \code{\link{plot.MCepi}} method 
 }
 \references{
-\emph{A statistical framework for the adaptive management of 
-epidemiological interventions} (2008). 
-Daniel Merl, Leah R. Johnson, Robert B. Gramacy, and Marc S. Mangel.
-Duke Working Paper 08-29.
-\url{http://ftp.stat.duke.edu/WorkingPapers/08-29.html}
+D. Merl, L.R. Johnson, R.B. Gramacy, and M.S. Mangel (2010).
+\dQuote{\pkg{amei}: An \R Package for the Adaptive Management of
+Epidemiological Interventions}.  \emph{Journal of Statistical Software}
+\bold{36}(6), 1-32. \url{http://www.jstatsoft.org/v36/i06/}
+  
+D. Merl, L.R. Johnson, R.B. Gramacy, M.S. Mangel (2009). \dQuote{A
+Statistical Framework for the Adaptive Management of Epidemiological
+Interventions}.  \emph{PLoS ONE}, \bold{4}(6), e5807.
+\url{http://www.plosone.org/article/info:doi/10.1371/journal.pone.0005807}
 }
 \author{
-Daniel Merl <dan@stat.duke.edu>, 
-Leah R. Johnson <leah@statslab.cam.ac.uk>, 
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>,
+Daniel Merl <dan@stat.duke.edu>\cr
+Leah R. Johnson <leah@statslab.cam.ac.uk>\cr
+Robert B. Gramacy <bobby@statslab.cam.ac.uk>\cr
 and Mark S. Mangel <msmangl@ams.ucsc.edu>
 }
 %\note{ ~~further notes~~ 

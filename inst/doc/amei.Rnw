@@ -50,7 +50,9 @@ options(width=70, prompt="R> ", digits=5)
   produced through this framework are adaptive: vaccination schedules
   are iteratively adjusted to reflect the anticipated trajectory of
   the epidemic given the current population state and updated
-  parameter estimates.  This document briefly covers the background
+  parameter estimates.  This document, which is (slightly) modified
+  version of \cite{Merl+Johnson+Gramacy:2010}, published in the {\em
+    Journal of Statistical Software}, briefly covers the background
   and methodology underpinning the implementation provided by the
   package and contains extensive examples showing the functions and
   methods in action.}

@@ -43,7 +43,7 @@ given by:
 \intertext{where}
 p_i(a,C,C_0) &= 1-\exp\left(\frac{-aC}{C+C_0} \right) \label{itilde}
 \end{align}
-and Bin$(n,\pi)$ is the standard binomial distribution.  The dynamics
+and Bin$(n,\pi)$ is the binomial distribution.  The dynamics
 for $\tilde{R}$ and $\tilde{D}$ are exactly as before
 (Eqs.~(\ref{rtilde}--\ref{dtilde})).  The single step dynamics for the
 reservoir are expected to be more smooth than the epidemic in the

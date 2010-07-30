@@ -2,20 +2,19 @@
 ### chunk number 1: 
 ###################################################
 library(amei)
-options(width=60)
+options(width=70, prompt="R> ", digits=5)
 
 
 ###################################################
 ### chunk number 2: 
 ###################################################
-seed <- 12345
-set.seed(seed)
+set.seed(12345)
 
 
 ###################################################
 ### chunk number 3: 
 ###################################################
-true <- list(b=0.00218, k=10, nu=0.4, mu=0) 
+tp <- list(b=0.00218, k=10, nu=0.4, mu=0) 
 init <- list(S0=762, I0=1, R0=0, D0=0) 
 costs <- list(vac=2, death=4, infect=1)
 
@@ -29,7 +28,7 @@ vac <- list(frac=0, stop=0)
 ###################################################
 ### chunk number 5: 
 ###################################################
-init.MCepi <- MCepi(init, true, vac, costs)
+init.MCepi <- MCepi(init, tp, vac, costs)
 
 
 ###################################################
@@ -47,21 +46,21 @@ plot(init.MCepi, type="costs")
 ###################################################
 ### chunk number 8: 
 ###################################################
-vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-75,75)) 
+vacgrid <- list(fracs=seq(0,1.0,0.1),stops=seq(2,init$S0-75,75)) 
 
 
 ###################################################
 ### chunk number 9: 
 ###################################################
-out.optvac <- optvac(init, true, vacgrid, costs) 
+out.optvac <-optvac(init, tp, vacgrid, costs) 
 
 
 ###################################################
 ### chunk number 10: 
 ###################################################
-best <- getpolicy(out.optvac) 
-worst <-getpolicy(out.optvac, which="worst") 
-rbind(best, worst) 
+best <-getpolicy(out.optvac) 
+worst <-getpolicy(out.optvac, which="worst")
+rbind(best, worst)
 
 
 ###################################################
@@ -74,7 +73,7 @@ plot(out.optvac)
 ### chunk number 12: 
 ###################################################
 vac.opt <- best[3:4]
-opt.MCepi <- MCepi(init, true, vac.opt, costs)
+opt.MCepi <- MCepi(init, tp, vac.opt, costs)
 
 
 ###################################################
@@ -138,7 +137,7 @@ getcost(out.man)
 ### chunk number 22: params
 ###################################################
 true <- as.list(formals(epistep)$true)
-plot(out.man, type="params",true=true) 
+plot(out.man, type="params",tp=tp) 
 
 
 ###################################################
@@ -150,41 +149,47 @@ out.man
 ###################################################
 ### chunk number 24: 
 ###################################################
+set.seed(12345)
+
+
+###################################################
+### chunk number 25: 
+###################################################
 out.MCmanage <- MCmanage(init, epistep, vacgrid, costs)
 
 
 ###################################################
-### chunk number 25: MCmanepis
+### chunk number 26: MCmanepis
 ###################################################
 plot(out.MCmanage)
 
 
 ###################################################
-### chunk number 26: MCmancosts
+### chunk number 27: MCmancosts
 ###################################################
 plot(out.MCmanage, type="costs")
 
 
 ###################################################
-### chunk number 27: 
+### chunk number 28: 
 ###################################################
 getvac(out.MCmanage)
 
 
 ###################################################
-### chunk number 28: MCmanfracs
+### chunk number 29: MCmanfracs
 ###################################################
 plot(out.MCmanage, type="fracs")
 
 
 ###################################################
-### chunk number 29: MCmanstops
+### chunk number 30: MCmanstops
 ###################################################
 plot(out.MCmanage, type="stops")
 
 
 ###################################################
-### chunk number 30: 
+### chunk number 31: 
 ###################################################
 cinit <- getcost(init.MCepi)
 copt <- getcost(opt.MCepi)
@@ -194,13 +199,13 @@ data.frame(rbind(cinit, copt, cman),
 
 
 ###################################################
-### chunk number 31: 
+### chunk number 32: 
 ###################################################
 bad <- list(b=0.001, k=10, nu=0.9, mu=0)
 
 
 ###################################################
-### chunk number 32: 
+### chunk number 33: 
 ###################################################
 costs.bad <- optvac(init, bad, vacgrid, costs)
 pol.bad <- getpolicy(costs.bad)
@@ -208,45 +213,44 @@ pol.bad
 
 
 ###################################################
-### chunk number 33: 
+### chunk number 34: 
 ###################################################
-bad.MCepi <- MCepi(init, true, pol.bad[3:4], costs)
+bad.MCepi <- MCepi(init, tp, pol.bad[3:4], costs)
 cbad <- getcost(bad.MCepi)
 cbad
 
 
 ###################################################
-### chunk number 34: 
-###################################################
-seed <- 12345
-set.seed(seed)
-
-
-###################################################
 ### chunk number 35: 
+###################################################
+set.seed(12345)
+
+
+###################################################
+### chunk number 36: 
 ###################################################
 alt.epistep <- 
 function(SIR, last=list(rem=0, rec=0, infect=0, dead=0, Z=0),
-         true=list(a = 0.05, mu = 0.05, nu = 0.1, m = 0.4, 
+         tp=list(a = 0.05, mu = 0.05, nu = 0.1, m = 0.4, 
 	 rho = 200, C = 500))
 {
   ## calculate the infection probability based on the
-  ## resevoir, and randomly infect susceptibles
+  ## reservoir, and randomly infect susceptibles
   Z <- last$Z
-  fz <- Z/(Z+true$C)
-  pi <- 1 - exp(-true$a * fz)
+  fz <- Z/(Z+tp$C)
+  pi <- 1 - exp(-tp$a * fz)
   infect <- rbinom(1, SIR$S, pi)
 
   ## update recovereds and deaths
-  pr <- 1 - exp(-true$nu)
+  pr <- 1 - exp(-tp$nu)
   rec <- rbinom(1,SIR$I,pr)
-  pd <- 1 - exp(-true$mu)
+  pd <- 1 - exp(-tp$mu)
   dead <- rbinom(1, SIR$I-rec, pd)
 
-  ## resevoir dynamics
-  pz <- 1 - exp(-true$m)
+  ## reservoir dynamics
+  pz <- 1 - exp(-tp$m)
   dz <- rbinom(1, Z, pz)
-  bz <- round(SIR$I*true$rho)
+  bz <- round(SIR$I*tp$rho)
   Z <- Z - dz + bz
 
   ## the returned list is passed in as "last" in a
@@ -257,152 +261,152 @@ function(SIR, last=list(rem=0, rec=0, infect=0, dead=0, Z=0),
 
 
 ###################################################
-### chunk number 36: 
+### chunk number 37: 
 ###################################################
 init1 <- list(S0=150, I0=1, R0=0, D0=0)
-true<- list(a=0.065, mu=0.0, nu=0.3, m=0.99, rho=500, C=500)
+tp <- list(a=0.1, mu=0.0, nu=0.3, m=50, rho=500, C=500)
 alt.epistep1 <- alt.epistep
-formals(alt.epistep1)$true <- true
+formals(alt.epistep1)$tp <- tp
 out.alt<- manage(init1, alt.epistep1, NULL, NULL, T=80)
 
 
 ###################################################
-### chunk number 37: 
+### chunk number 38: 
 ###################################################
-true <- list(a=0.065, mu=0.0, nu=0.3, m=0.005, rho=500, C=500)
+tp <- list(a=0.1, mu=0.0, nu=0.3, m=0.001, rho=500, C=500)
 alt.epistep2 <- alt.epistep
-formals(alt.epistep2)$true <- true
+formals(alt.epistep2)$tp <- tp
 out.alt2 <- manage(init1, alt.epistep2, NULL, NULL, T=80)
 
 
 ###################################################
-### chunk number 38: alt
+### chunk number 39: alt
 ###################################################
-plot(out.alt)
+plot(out.alt,showv=FALSE)
 
 
 ###################################################
-### chunk number 39: alt2
+### chunk number 40: alt2
 ###################################################
-plot(out.alt2)
+plot(out.alt2,showv=FALSE)
 
 
 ###################################################
-### chunk number 40: alt-params
+### chunk number 41: alt-params
 ###################################################
 plot(out.alt, type="params", showd=TRUE)
 
 
 ###################################################
-### chunk number 41: alt2-params
+### chunk number 42: alt2-params
 ###################################################
 plot(out.alt2, type="params", showd=TRUE)
 
 
 ###################################################
-### chunk number 42: 
+### chunk number 43: 
 ###################################################
 init <- list(S0=600, I0=1, R0=0, D0=0)
-time=80
+time <- 80
 posterior <- manage(init, alt.epistep, NULL, NULL, T=time, bkrate=100)
 
 
 ###################################################
-### chunk number 43: alt-mixing-b
+### chunk number 44: alt-mixing-b
 ###################################################
-plot(log(posterior$samp$b), type="l", main="")
+plot(log(posterior$samp$b), type="l", main="",ylab=expression(b))
 
 
 ###################################################
-### chunk number 44: alt-mixing-k
+### chunk number 45: alt-mixing-k
 ###################################################
-plot(posterior$samp$k, type="l", main="")
+plot(posterior$samp$k, type="l", main="",ylab=expression(k))
 
 
 ###################################################
-### chunk number 45: alt-mixing-nu
+### chunk number 46: alt-mixing-nu
 ###################################################
-plot(posterior$samp$nu, type="l", main="")
+plot(posterior$samp$nu, type="l", main="",ylab=expression(nu))
 
 
 ###################################################
-### chunk number 46: alt-mixing-mu
+### chunk number 47: alt-mixing-mu
 ###################################################
-plot(posterior$samp$mu, type="l", main="")
-
-
-###################################################
-### chunk number 47: 
-###################################################
-mean.params <- as.list(apply(posterior$samp, 2, mean))
+plot(posterior$samp$mu, type="l", main="",ylab=expression(mu))
 
 
 ###################################################
 ### chunk number 48: 
 ###################################################
-costs <- list(vac=2, death=4, infect=1) 
+mean.params <- as.list(apply(posterior$samp, 2, mean))
+
+
+###################################################
+### chunk number 49: 
+###################################################
+costs <- list(vac=2.5, death=4, infect=1) 
 vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-50,50)) 
 alt.optvac <- optvac(init, mean.params, vacgrid, costs, T=time)
 alt.best <- getpolicy(alt.optvac)
 
 
 ###################################################
-### chunk number 49: alt-optvac
+### chunk number 50: alt-optvac
 ###################################################
 plot(alt.optvac)
 
 
 ###################################################
-### chunk number 50: 
+### chunk number 51: 
 ###################################################
 alt.vac.opt <- alt.best[3:4]
 alt.MCepi <- MCepi(init, alt.epistep, alt.vac.opt, costs, T=time)
 
 
 ###################################################
-### chunk number 51: 
+### chunk number 52: 
 ###################################################
 getcost(alt.MCepi)
 
 
 ###################################################
-### chunk number 52: 
+### chunk number 53: 
 ###################################################
 alt.MCmanage <- MCmanage(init, alt.epistep, vacgrid, costs, T=time)
 
 
 ###################################################
-### chunk number 53: 
+### chunk number 54: 
 ###################################################
 getcost(alt.MCmanage)
 
 
 ###################################################
-### chunk number 54: alt-MCepi-t
+### chunk number 55: alt-MCepi-t
 ###################################################
 plot(alt.MCepi, showd=TRUE)
 
 
 ###################################################
-### chunk number 55: alt-MCepi-c
+### chunk number 56: alt-MCepi-c
 ###################################################
 plot(alt.MCepi, type="costs")
 
 
 ###################################################
-### chunk number 56: alt-MCmanage-t
+### chunk number 57: alt-MCmanage-t
 ###################################################
 plot(alt.MCmanage, showd=TRUE)
 
 
 ###################################################
-### chunk number 57: alt-MCmanage-c
+### chunk number 58: alt-MCmanage-c
 ###################################################
 plot(alt.MCmanage, type="costs")
 
 
 ###################################################
-### chunk number 58: 
+### chunk number 59: 
 ###################################################
 alt.worst <- getpolicy(alt.optvac, which ="worst") 
 rbind(alt.best, alt.worst) 

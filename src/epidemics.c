@@ -39,16 +39,16 @@ void SimulateEpidemic(int* S, int* I, int* R, int* D, int* V, double* C, int T,
 		      double vacc, int vaccstop,double cvacc, double cdeath, 
 		      double cinfected,int starttime)
 {
-  int N0,i,t,itilde,rtilde,dtilde,ztilde,vtilde;
-  double *infectionProb,totalRemovalProb,recoveryProb;
+  int N0,t,itilde,rtilde,dtilde,ztilde,vtilde;
+  double totalRemovalProb,recoveryProb;
   
   N0=S[0]+I[0];
   
   /* precalculate the infections probabilities associated with each
      number of infecteds */
-  infectionProb = new_vector(N0+1);
-  for(i=0;i<N0+1;i++)
-    infectionProb[i] = 1-exp(k*log(k/(k+b*i)));
+  /* infectionProb = new_vector(N0+1);
+     for(i=0;i<N0+1;i++)
+     infectionProb[i] = 1-exp(k*log(k/(k+b*i))); */
   
   /* load the probabilities of removal (meaning either recovery or
      death), and the relative probabilities of recovery and death
@@ -73,7 +73,9 @@ void SimulateEpidemic(int* S, int* I, int* R, int* D, int* V, double* C, int T,
 	  vtilde = (S[t-1]>vaccstop) ? (int) ceil(vacc*(double)S[t-1]) : 0;
 	}
       
-      itilde = rbinom(S[t-1]-vtilde,infectionProb[I[t-1]]);
+      /* Thanks to Michael Hohle */
+      /* itilde = rbinom(S[t-1]-vtilde,infectionProb[I[t-1]]); */
+      itilde = rbinom(S[t-1]-vtilde, 1-exp(k*log(k/(k+b*I[t-1]))));
       
       S[t] = S[t-1] - vtilde - itilde;
       I[t] = I[t-1] + itilde - ztilde;
@@ -86,7 +88,7 @@ void SimulateEpidemic(int* S, int* I, int* R, int* D, int* V, double* C, int T,
     }
   
   PutRNGstate();	
-  free(infectionProb);
+  /* free(infectionProb); */
 }
 
 // R interface to SimulateEpidemics()

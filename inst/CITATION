@@ -1,0 +1,22 @@
+citHeader("To cite amei in publications use:")
+
+citEntry(entry = "Article",
+  title        = "{amei}: An {R} Package for the Adaptive Management of Epidemiological Interventions",
+  author       = personList(as.person("Daniel Merl"),
+                   as.person("Leah R. Johnson"),
+                   as.person("Robert B. Gramacy"),
+                   as.person("Marc Mangel")),
+  journal      = "Journal of Statistical Software",
+  year         = "2010",
+  volume       = "36",
+  number       = "6",
+  pages        = "1--32",
+  url          = "http://www.jstatsoft.org/v36/i06/",
+
+  textVersion  =
+  paste("Daniel Merl, Leah R. Johnson, Robert B. Gramacy, Marc Mangel (2010).",
+        "amei: An R Package for the Adaptive Management of Epidemiological Interventions.",
+        "Journal of Statistical Software, 36(6), 1-32.",
+        "URL http://www.jstatsoft.org/v36/i06/.")
+)
+

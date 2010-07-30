@@ -1,3 +1,13 @@
+1.0-4 (30 July 2010)
+-----
+
+removed precalculation of infection probabilities
+in C-side SimulateEpidemics for efficiency -- 
+thanks to Michael Hohle
+
+added CITATION file for JSS
+
+
 1.0-3 (17 June 2010)
 -----
 
