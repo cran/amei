@@ -1,13 +1,13 @@
 Package: amei
 Type: Package
 Title: Adaptive Management of Epidemiological Interventions
-Version: 1.0-4
-Date: 2010-07-30
-Author: Daniel Merl <dan@stat.duke.edu>, Leah R. Johnson
-        <leah@statslab.cam.ac.uk>, Robert B. Gramacy
-        <bobby@statslab.cam.ac.uk>, and Marc S. Mangel
+Version: 1.0-5
+Date: 2012-11-01
+Author: Daniel Merl <danmerl@gmail.com>, Leah R. Johnson
+        <lrjohnson@uchicago.edu>, Robert B. Gramacy
+        <rbgramacy@chicagobooth.edu>, and Marc S. Mangel
         <msmangel@ams.ucsc.edu>
-Maintainer: Robert B. Gramacy <bobby@statslab.cam.ac.uk>
+Maintainer: Robert B. Gramacy <rbgramacy@chicagobooth.edu>
 Description: This package provides a flexible statistical framework for
         generating optimal epidemiological interventions that are
         designed to minimize the total expected cost of an emerging
@@ -20,6 +20,6 @@ Description: This package provides a flexible statistical framework for
         parameter estimates.
 License: GPL
 LazyLoad: yes
-Packaged: 2012-10-29 08:58:12 UTC; ripley
+Packaged: 2012-11-02 14:25:50 UTC; bobby
 Repository: CRAN
-Date/Publication: 2012-10-29 08:58:12
+Date/Publication: 2012-11-02 15:11:05

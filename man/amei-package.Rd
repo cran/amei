@@ -15,13 +15,13 @@
   state and updated parameter estimates.
 }
 \author{
-Daniel Merl <dan@stat.duke.edu>\cr
-Leah R. Johnson <leah@statslab.cam.ac.uk>\cr
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>\cr
+Daniel Merl <danmerl@gmail.com>\cr
+Leah R. Johnson <lrjohnson@uchicago.edu>\cr
+Robert B. Gramacy <rbgramacy@chicagobooth.edu>\cr
 and Mark S. Mangel <msmangl@ams.ucsc.edu>
 
 Maintainer: 
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>
+Robert B. Gramacy <rbgramacy@chicagobooth.edu>
 }
 \references{
 

@@ -70,9 +70,9 @@ Murray, J. D. (2002) \emph{Mathematical Biology I: An Introduction}.
 Springer Verlag
 }
 \author{
-Daniel Merl <dan@stat.duke.edu>\cr
-Leah R. Johnson <leah@statslab.cam.ac.uk>\cr
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>\cr
+Daniel Merl <danmerl@gmail.com>\cr
+Leah R. Johnson <lrjohnson@uchicago.edu>\cr
+Robert B. Gramacy <rbgramacy@chicagobooth.edu>\cr
 and Mark S. Mangel <msmangl@ams.ucsc.edu>
 }
 \seealso{ \code{\link{manage}}, \code{\link{MCmanage}} }

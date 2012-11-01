@@ -51,9 +51,9 @@ Interventions}.  \emph{PLoS ONE}, \bold{4}(6), e5807.
 \url{http://www.plosone.org/article/info:doi/10.1371/journal.pone.0005807}
 }
 \author{
-Daniel Merl <dan@stat.duke.edu>\cr
-Leah R. Johnson <leah@statslab.cam.ac.uk>\cr
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>\cr
+Daniel Merl <danmerl@gmail.com>\cr
+Leah R. Johnson <lrjohnson@uchicago.edu>\cr
+Robert B. Gramacy <rbgramacy@chicagobooth.edu>\cr
 and Mark S. Mangel <msmangl@ams.ucsc.edu>
 }
 %\note{ ~~further notes~~ 

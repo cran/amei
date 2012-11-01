@@ -246,7 +246,7 @@ vaccinate <- function(nS,nI, samp, vacsamps, costs,
                               use.samp$k[j],use.samp$nu[j],use.samp$mu[j],
                               costs$vac, costs$death, costs$infect,
                               MCvits, vacgrid$fracs, vacgrid$stops,
-                              midepidemic=TRUE,start=0)
+                              midepidemic=TRUE,starttime=0)
       bestpol <- which(VP==min(VP),arr.ind=TRUE)[1,]
       Vfractions[j] <-vacgrid$fracs[bestpol[1]]
       Vstoptimes[j] <-vacgrid$stops[bestpol[2]]

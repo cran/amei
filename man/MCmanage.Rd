@@ -131,9 +131,9 @@ Interventions}.  \emph{PLoS ONE}, \bold{4}(6), e5807.
 \url{http://www.plosone.org/article/info:doi/10.1371/journal.pone.0005807}
 }
 \author{
-Daniel Merl <dan@stat.duke.edu>\cr
-Leah R. Johnson <leah@statslab.cam.ac.uk>\cr
-Robert B. Gramacy <bobby@statslab.cam.ac.uk>\cr
+Daniel Merl <danmerl@gmail.com>\cr
+Leah R. Johnson <lrjohnson@uchicago.edu>\cr
+Robert B. Gramacy <rbgramacy@chicagobooth.edu>\cr
 and Mark S. Mangel <msmangl@ams.ucsc.edu>
 }
 %\note{ ~~further notes~~ 
@@ -149,11 +149,17 @@ init <- list(S0=762, I0=1, R0=0, D0=0)
 
 ## construct a grid of valid vaccination strategies
 ## and specify costs
-vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-75,75))
+## using a smaller grid for faster check times; try the commented out
+## setting for higher fidelity
+vacgrid <- list(fracs=seq(0,1.0,0.25), stops=seq(2,init$S0-75,150))
+## vacgrid <- list(fracs=seq(0,1.0,0.1), stops=seq(2,init$S0-75,75))
 costs <- list(vac=2, death=4, infect=1)
 
-## run the Monte Carlo management experiment
-out.MCmanage <- MCmanage(init, epistep, vacgrid, costs)
+## run the Monte Carlo management experiment, reducing MCMCpits
+## for faster check times; try default (commented out) version
+out.MCmanage <- MCmanage(init, epistep, vacgrid, costs, 
+                         MCMCpits=100, MCreps=5)
+## out.MCmanage <- MCmanage(init, epistep, vacgrid, costs)
 
 ## plot the trajectories of SIR and the associated costs
 plot(out.MCmanage, main="optimal adaptive vaccination")
