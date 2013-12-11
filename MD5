@@ -1,5 +1,5 @@
 5a087af74fd2bdd60781f0807e9930c2 *ChangeLog
-28a839f866142deb1778d11509aaa617 *DESCRIPTION
+b659ededc4553d4dac1d75838b31f689 *DESCRIPTION
 88a1eab180c5593a2159f5b4428eae97 *NAMESPACE
 17bf0b2d8247f8b12dd9e27bf23be812 *R/MC.R
 149e65ef2c9fcf951de4443112624e39 *R/MC_util.R
@@ -11,13 +11,9 @@ fa07a168409cba773d7799c9408b70d3 *R/print.R
 059ec4fd2d7dd6207de98430e8d61c42 *demo/00Index
 03bfbe290ec962c7176f077417fb3547 *demo/amei.R
 a07a070a305f7b992af2815d42353dec *inst/CITATION
-35db958402dbb36b72f4fcaf50701491 *inst/doc/alt_trans.iRnw
+880ebadbbd82eb06600082a20b4f1460 *inst/doc/amei.R
 1de7734bb3b49816437ae7af8bc0ecb3 *inst/doc/amei.Rnw
-dee4ead3cea3e35a268fb3c56bcea8c8 *inst/doc/amei.bib
-7425f90b2a3aa50bbccc73819fc23eda *inst/doc/amei.pdf
-b9564ddd59a06782310989e8f33db55e *inst/doc/jsslogo.jpg
-579601e8db83b9b659bc3d1be8991928 *inst/doc/pnas.iRnw
-7de410f6557702f07fcce7e4abec611f *inst/doc/pnas_mcmanage.iRnw
+e8aecdbc20e7f57dd771e0514388cf00 *inst/doc/amei.pdf
 7168425a4bef1ed681f891294d6e8865 *man/MCepi.Rd
 db1f7d0ced8aec3cb1f23f98e6e28931 *man/MCmanage.Rd
 5ee489068583455aed55c27b5e10e6f3 *man/amei-internal.Rd
@@ -39,3 +35,9 @@ ae4714597b4d93c76c4b310517818c74 *man/print.Rd
 8af3ec5443b666053a28099ffd0229bb *src/ssdiff.h
 8ced34ac9b18c9eeccb7bc16dcbbd58f *src/state.c
 373996a4518213358f07479d65fb972c *src/state.h
+35db958402dbb36b72f4fcaf50701491 *vignettes/alt_trans.iRnw
+1de7734bb3b49816437ae7af8bc0ecb3 *vignettes/amei.Rnw
+dee4ead3cea3e35a268fb3c56bcea8c8 *vignettes/amei.bib
+b9564ddd59a06782310989e8f33db55e *vignettes/jsslogo.jpg
+579601e8db83b9b659bc3d1be8991928 *vignettes/pnas.iRnw
+7de410f6557702f07fcce7e4abec611f *vignettes/pnas_mcmanage.iRnw
