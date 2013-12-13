@@ -1,5 +1,5 @@
-5a087af74fd2bdd60781f0807e9930c2 *ChangeLog
-b659ededc4553d4dac1d75838b31f689 *DESCRIPTION
+90ca2152d9a24718ad7dd12ae970d95d *ChangeLog
+d97444f8d9296d733f6a6d06b43ad5e8 *DESCRIPTION
 88a1eab180c5593a2159f5b4428eae97 *NAMESPACE
 17bf0b2d8247f8b12dd9e27bf23be812 *R/MC.R
 149e65ef2c9fcf951de4443112624e39 *R/MC_util.R
@@ -11,9 +11,11 @@ fa07a168409cba773d7799c9408b70d3 *R/print.R
 059ec4fd2d7dd6207de98430e8d61c42 *demo/00Index
 03bfbe290ec962c7176f077417fb3547 *demo/amei.R
 a07a070a305f7b992af2815d42353dec *inst/CITATION
-880ebadbbd82eb06600082a20b4f1460 *inst/doc/amei.R
+35db958402dbb36b72f4fcaf50701491 *inst/doc/alt_trans.iRnw
 1de7734bb3b49816437ae7af8bc0ecb3 *inst/doc/amei.Rnw
 e8aecdbc20e7f57dd771e0514388cf00 *inst/doc/amei.pdf
+579601e8db83b9b659bc3d1be8991928 *inst/doc/pnas.iRnw
+7de410f6557702f07fcce7e4abec611f *inst/doc/pnas_mcmanage.iRnw
 7168425a4bef1ed681f891294d6e8865 *man/MCepi.Rd
 db1f7d0ced8aec3cb1f23f98e6e28931 *man/MCmanage.Rd
 5ee489068583455aed55c27b5e10e6f3 *man/amei-internal.Rd

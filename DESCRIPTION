@@ -1,8 +1,8 @@
 Package: amei
 Type: Package
 Title: Adaptive Management of Epidemiological Interventions
-Version: 1.0-6
-Date: 2013-12-11
+Version: 1.0-7
+Date: 2013-12-13
 Author: Daniel Merl <danmerl@gmail.com>, Leah R. Johnson <lrjohnson@uchicago.edu>, Robert B. Gramacy <rbgramacy@chicagobooth.edu>, and Marc S. Mangel <msmangel@ams.ucsc.edu>
 Maintainer: Robert B. Gramacy <rbgramacy@chicagobooth.edu>
 Description: 
@@ -15,7 +15,6 @@ Description:
  epidemic given the current population state and updated parameter estimates.
 License: GPL
 LazyLoad: yes
-Packaged: 2013-12-12 18:27:26 UTC; rgramacy
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-12-13 00:32:20
+Date/Publication: 2013-12-13 21:57:38
